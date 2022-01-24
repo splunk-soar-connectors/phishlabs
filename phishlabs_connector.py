@@ -15,15 +15,16 @@
 #
 #
 # Phantom App imports
+import json
+
 import phantom.app as phantom
-from phantom.base_connector import BaseConnector
+import requests
+from bs4 import BeautifulSoup
 from phantom.action_result import ActionResult
+from phantom.base_connector import BaseConnector
 
 # Usage of the consts file is recommended
 from phishlabs_consts import *
-import requests
-import json
-from bs4 import BeautifulSoup
 
 
 class RetVal(tuple):
@@ -408,8 +409,9 @@ class PhishlabsConnector(BaseConnector):
 
 if __name__ == '__main__':
 
-    import pudb
     import argparse
+
+    import pudb
 
     pudb.set_trace()
 
