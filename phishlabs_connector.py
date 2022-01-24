@@ -423,7 +423,6 @@ if __name__ == '__main__':
     argparser.add_argument('-p', '--password', help='password', required=False)
     argparser.add_argument('-v', '--verify', action='store_true', help='verify', required=False, default=False)
 
-
     args = argparser.parse_args()
     session_id = None
 
@@ -453,7 +452,8 @@ if __name__ == '__main__':
             headers['Referer'] = BaseConnector._get_phantom_base_url() + 'login'
 
             print("Logging into Platform to get the session id")
-            r2 = requests.post(BaseConnector._get_phantom_base_url() + "login", verify=verify, data=data, headers=headers, timeout=PHISHLABS_DEFAULT_TIMEOUT)
+            r2 = requests.post(BaseConnector._get_phantom_base_url() + "login", verify=verify, data=data,
+                headers=headers, timeout=PHISHLABS_DEFAULT_TIMEOUT)
             session_id = r2.cookies['sessionid']
         except Exception as e:
             print("Unable to get session id from the platfrom. Error: " + str(e))
