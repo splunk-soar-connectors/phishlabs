@@ -21,3 +21,5 @@ PHISHLABS_BASE_URL = "https://caseapi.phishlabs.com/v1"
 
 PHISHLABS_JSON_USERNAME = "username"
 PHISHLABS_JSON_PASSWORD = "password"
+
+PHISHLABS_DEFAULT_TIMEOUT = 30
