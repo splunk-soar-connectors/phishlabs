@@ -2,11 +2,11 @@
 # PhishLabs
 
 Publisher: Splunk  
-Connector Version: 2\.0\.1  
+Connector Version: 2\.0\.4  
 Product Vendor: PhishLabs  
 Product Name: PhishLabs  
 Product Version Supported (regex): "\.\*"  
-Minimum Product Version: 4\.10\.0\.40961  
+Minimum Product Version: 5\.1\.0  
 
 This app implements investigative actions on the PhishLabs Casetracker Portal
 
