@@ -14,7 +14,7 @@
     "utctime_updated": "2022-01-25T00:19:30.000000Z",
     "package_name": "phantom_phishlabs",
     "main_module": "phishlabs_connector.py",
-    "min_phantom_version": "4.10.0.40961",
+    "min_phantom_version": "5.1.0",
     "python_version": "3",
     "fips_compliant": true,
     "latest_tested_versions": [
