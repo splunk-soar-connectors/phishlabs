@@ -9,13 +9,14 @@
     "product_name": "PhishLabs",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2018-2021 Splunk Inc.",
-    "app_version": "2.0.0",
-    "utctime_updated": "2018-12-07T02:01:07.000000Z",
+    "license": "Copyright (c) 2018-2022 Splunk Inc.",
+    "app_version": "2.0.4",
+    "utctime_updated": "2022-01-27T22:10:48.000000Z",
     "package_name": "phantom_phishlabs",
     "main_module": "phishlabs_connector.py",
-    "min_phantom_version": "4.10.0.40961",
+    "min_phantom_version": "5.1.0",
     "python_version": "3",
+    "fips_compliant": true,
     "latest_tested_versions": [
         "Cloud, October 8, 2021"
     ],
@@ -1103,5 +1104,37 @@
             },
             "versions": "EQ(*)"
         }
-    ]
+    ],
+    "pip_dependencies": {
+        "wheel": [
+            {
+                "module": "beautifulsoup4",
+                "input_file": "wheels/beautifulsoup4-4.9.1-py3-none-any.whl"
+            },
+            {
+                "module": "certifi",
+                "input_file": "wheels/certifi-2021.10.8-py2.py3-none-any.whl"
+            },
+            {
+                "module": "chardet",
+                "input_file": "wheels/chardet-3.0.4-py2.py3-none-any.whl"
+            },
+            {
+                "module": "idna",
+                "input_file": "wheels/idna-2.10-py2.py3-none-any.whl"
+            },
+            {
+                "module": "requests",
+                "input_file": "wheels/requests-2.25.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "soupsieve",
+                "input_file": "wheels/soupsieve-2.3.1-py3-none-any.whl"
+            },
+            {
+                "module": "urllib3",
+                "input_file": "wheels/urllib3-1.26.8-py2.py3-none-any.whl"
+            }
+        ]
+    }
 }
