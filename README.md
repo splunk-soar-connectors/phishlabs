@@ -2,7 +2,7 @@
 # PhishLabs
 
 Publisher: Splunk  
-Connector Version: 2.0.5  
+Connector Version: 2.0.6  
 Product Vendor: PhishLabs  
 Product Name: PhishLabs  
 Product Version Supported (regex): ".\*"  
