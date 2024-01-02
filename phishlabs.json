@@ -10,7 +10,7 @@
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "license": "Copyright (c) 2018-2024 Splunk Inc.",
-    "app_version": "2.0.6",
+    "app_version": "2.0.5",
     "utctime_updated": "2022-01-27T22:10:48.000000Z",
     "package_name": "phantom_phishlabs",
     "main_module": "phishlabs_connector.py",
