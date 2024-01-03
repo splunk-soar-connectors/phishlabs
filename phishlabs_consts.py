@@ -1,6 +1,6 @@
 # File: phishlabs_consts.py
 #
-# Copyright (c) 2018-2022 Splunk Inc.
+# Copyright (c) 2018-2024 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,6 +20,6 @@ PHISHLABS_USING_BASE_URL = "Using url: {base_url}"
 PHISHLABS_BASE_URL = "https://caseapi.phishlabs.com/v1"
 
 PHISHLABS_JSON_USERNAME = "username"
-PHISHLABS_JSON_PASSWORD = "password"
+PHISHLABS_JSON_PASSWORD = "password"  # pragma: allowlist secret
 
 PHISHLABS_DEFAULT_TIMEOUT = 30
