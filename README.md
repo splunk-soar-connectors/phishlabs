@@ -1,9 +1,9 @@
 # PhishLabs
 
-Publisher: Splunk \
-Connector Version: 2.0.5 \
-Product Vendor: PhishLabs \
-Product Name: PhishLabs \
+Publisher: Splunk <br>
+Connector Version: 2.0.5 <br>
+Product Vendor: PhishLabs <br>
+Product Name: PhishLabs <br>
 Minimum Product Version: 5.1.0
 
 This app implements investigative actions on the PhishLabs Casetracker Portal
@@ -19,17 +19,17 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 
 ### Supported Actions
 
-[test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity using supplied configuration \
-[get ticket](#action-get-ticket) - Get case (issue) information \
-[create ticket](#action-create-ticket) - Create a new case submission \
-[list tickets](#action-list-tickets) - Get a list of cases in PhishLabs \
+[test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity using supplied configuration <br>
+[get ticket](#action-get-ticket) - Get case (issue) information <br>
+[create ticket](#action-create-ticket) - Create a new case submission <br>
+[list tickets](#action-list-tickets) - Get a list of cases in PhishLabs <br>
 [get config](#action-get-config) - Return the list of brands and case types currently configured in PhishLabs
 
 ## action: 'test connectivity'
 
 Validate the asset configuration for connectivity using supplied configuration
 
-Type: **test** \
+Type: **test** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -44,7 +44,7 @@ No Output
 
 Get case (issue) information
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -104,7 +104,7 @@ action_result.data.\*.resolution | string | | This is a test case |
 
 Create a new case submission
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -144,7 +144,7 @@ action_result.data.\*.updatedCase.caseNumber | numeric | | 2648042 |
 
 Get a list of cases in PhishLabs
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -212,7 +212,7 @@ action_result.data.\*.caseLinks.\*.linkCreated | string | | 2021-10-11T13:48:55.
 
 Return the list of brands and case types currently configured in PhishLabs
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters

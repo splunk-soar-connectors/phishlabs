@@ -15,7 +15,7 @@
     "package_name": "phantom_phishlabs",
     "main_module": "phishlabs_connector.py",
     "min_phantom_version": "5.1.0",
-    "python_version": "3",
+    "python_version": "3.9, 3.13",
     "fips_compliant": true,
     "latest_tested_versions": [
         "Cloud, October 8, 2021"
