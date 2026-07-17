@@ -1,7 +1,7 @@
 # PhishLabs
 
 Publisher: Splunk <br>
-Connector Version: 2.0.6 <br>
+Connector Version: 2.0.7 <br>
 Product Vendor: PhishLabs <br>
 Product Name: PhishLabs <br>
 Minimum Product Version: 5.1.0
