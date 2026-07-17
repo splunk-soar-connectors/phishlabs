@@ -1,6 +1,6 @@
 # File: phishlabs_connector.py
 #
-# Copyright (c) 2018-2025 Splunk Inc.
+# Copyright (c) 2018-2026 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 #
 # Phantom App imports
 import json
+from urllib.parse import quote
 
 import phantom.app as phantom
 import requests
@@ -159,7 +160,7 @@ class PhishlabsConnector(BaseConnector):
 
         self.save_progress(f"Query the cases endpoint to test connectivity with base url {PHISHLABS_BASE_URL}")
         # make rest call
-        ret_val, response = self._make_rest_call("/data/cases", action_result, params=None, headers=None)
+        ret_val, _response = self._make_rest_call("/data/cases", action_result, params=None, headers=None)
 
         if phantom.is_fail(ret_val):
             # the call to the 3rd party device or service failed, action result should contain all the error details
@@ -185,7 +186,8 @@ class PhishlabsConnector(BaseConnector):
         case_id = param["case_id"]
 
         # make rest call
-        ret_val, response = self._make_rest_call(f"/data/cases/{case_id}", action_result, params=None, headers=None)
+        endpoint = f"/data/cases/{quote(str(case_id), safe='')}"
+        ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None)
 
         if phantom.is_fail(ret_val):
             # the call to the 3rd party device or service failed, action result should contain all the error details
