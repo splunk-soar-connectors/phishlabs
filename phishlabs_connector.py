@@ -16,6 +16,7 @@
 #
 # Phantom App imports
 import json
+from urllib.parse import quote
 
 import phantom.app as phantom
 import requests
@@ -185,7 +186,8 @@ class PhishlabsConnector(BaseConnector):
         case_id = param["case_id"]
 
         # make rest call
-        ret_val, response = self._make_rest_call(f"/data/cases/{case_id}", action_result, params=None, headers=None)
+        endpoint = f"/data/cases/{quote(str(case_id), safe='')}"
+        ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None)
 
         if phantom.is_fail(ret_val):
             # the call to the 3rd party device or service failed, action result should contain all the error details
