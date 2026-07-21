@@ -1,3 +1,3 @@
 **Unreleased**
 
-* - Updated connector development tooling.
+* Fixed get ticket to return an error when PhishLabs responds without case data.
