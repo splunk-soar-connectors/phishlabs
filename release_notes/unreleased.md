@@ -1,1 +1,3 @@
 **Unreleased**
+
+* Fixed get ticket to return an error when PhishLabs responds without case data.

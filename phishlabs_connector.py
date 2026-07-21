@@ -196,12 +196,16 @@ class PhishlabsConnector(BaseConnector):
 
         # Now post process the data,  uncomment code as you deem fit
 
-        # Add the response into the data section
-        for date in response["data"]:
-            if str(date["dateClosed"]) == "0001-01-01T00:00:00Z":
-                date["dateClosed"] = None
+        case_data = response.get("data")
+        if not isinstance(case_data, list) or not case_data or not all(isinstance(case, dict) for case in case_data):
+            return action_result.set_status(phantom.APP_ERROR, f"No case found for id {case_id}")
 
-        action_result.add_data(response["data"][0])
+        # Add the response into the data section
+        for case in case_data:
+            if str(case.get("dateClosed")) == "0001-01-01T00:00:00Z":
+                case["dateClosed"] = None
+
+        action_result.add_data(case_data[0])
         action_result.add_data({})
 
         # Add a dictionary that is made up of the most important values from data into the summary
