@@ -255,6 +255,10 @@ class PhishlabsConnector(BaseConnector):
             # so just return from here
             return action_result.get_status()
 
+        created_case = response.get("createdCase") if isinstance(response, dict) else None
+        if not isinstance(created_case, dict) or not created_case.get("caseId"):
+            return action_result.set_status(phantom.APP_ERROR, "PhishLabs did not confirm ticket creation")
+
         # Add the response into the data section
         action_result.add_data(response)
 
@@ -262,9 +266,9 @@ class PhishlabsConnector(BaseConnector):
 
         # Add a dictionary that is made up of the most important values from data into the summary
         summary = action_result.update_summary({})
-        summary["status"] = response.get("createdCase", {}).get("status")
-        summary["case_id"] = response.get("createdCase", {}).get("caseId")
-        summary["case_number"] = response.get("createdCase", {}).get("caseNumber")
+        summary["status"] = created_case.get("status")
+        summary["case_id"] = created_case.get("caseId")
+        summary["case_number"] = created_case.get("caseNumber")
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
