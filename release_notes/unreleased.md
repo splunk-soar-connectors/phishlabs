@@ -7,3 +7,5 @@
 * Fixed get config to return clear errors for malformed PhishLabs configuration data.
 
 * Fixed create ticket to require confirmation that PhishLabs created a case.
+
+* Fixed outbound PhishLabs API requests to time out after 30 seconds.

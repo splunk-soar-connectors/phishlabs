@@ -143,6 +143,7 @@ class PhishlabsConnector(BaseConnector):
                 json=data,
                 headers=headers,
                 params=params,
+                timeout=PHISHLABS_DEFAULT_TIMEOUT,
             )
         except Exception as e:
             return RetVal(action_result.set_status(phantom.APP_ERROR, f"Error Connecting to server. Details: {e!s}"), resp_json)
