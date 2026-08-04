@@ -335,8 +335,12 @@ class PhishlabsConnector(BaseConnector):
             # so just return from here
             return action_result.get_status()
 
+        brand_list = response.get("brands") if isinstance(response, dict) else None
+        if not isinstance(brand_list, list):
+            return action_result.set_status(phantom.APP_ERROR, "PhishLabs returned invalid brand data")
+
         # Add the response into the data section
-        brand_values = [{"name": str(brand)} for brand in response["brands"]]
+        brand_values = [{"name": str(brand)} for brand in brand_list]
         brands = {"brands": brand_values}
         action_result.add_data(brands)
 
@@ -348,8 +352,12 @@ class PhishlabsConnector(BaseConnector):
             # so just return from here
             return action_result.get_status()
 
+        case_type_list = response.get("caseType") if isinstance(response, dict) else None
+        if not isinstance(case_type_list, list):
+            return action_result.set_status(phantom.APP_ERROR, "PhishLabs returned invalid case type data")
+
         # Add the response into the data section
-        case_type_values = [{"name": str(case_type)} for case_type in response["caseType"]]
+        case_type_values = [{"name": str(case_type)} for case_type in case_type_list]
         case_types = {"case_types": case_type_values}
         action_result.add_data(case_types)
 
