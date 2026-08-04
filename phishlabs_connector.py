@@ -278,25 +278,40 @@ class PhishlabsConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # make rest call
-        ret_val, response = self._make_rest_call("/data/cases", action_result, params=None, headers=None)
+        offset = 0
+        total_cases = None
 
-        if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # so just return from here
-            return action_result.get_status()
+        for _ in range(PHISHLABS_MAX_PAGE_COUNT):
+            params = {"offset": offset} if offset else None
+            ret_val, response = self._make_rest_call("/data/cases", action_result, params=params, headers=None)
 
-        # Add the response into the data section
-        for item in response["data"]:
-            if str(item["dateClosed"]) == "0001-01-01T00:00:00Z":
-                item["dateClosed"] = None
-            action_result.add_data(item)
+            if phantom.is_fail(ret_val):
+                # the call to the 3rd party device or service failed, action result should contain all the error details
+                # so just return from here
+                return action_result.get_status()
+
+            page = response["data"]
+            for item in page:
+                if str(item["dateClosed"]) == "0001-01-01T00:00:00Z":
+                    item["dateClosed"] = None
+                action_result.add_data(item)
+
+            offset += len(page)
+            total_cases = response.get("header", {}).get("totalResult")
+            if not isinstance(total_cases, int) or total_cases < 0:
+                return action_result.set_status(phantom.APP_ERROR, "PhishLabs returned an invalid total case count")
+            if offset >= total_cases:
+                break
+            if not page:
+                return action_result.set_status(phantom.APP_ERROR, "PhishLabs returned an incomplete case listing")
+        else:
+            return action_result.set_status(phantom.APP_ERROR, "PhishLabs case pagination exceeded the safety limit")
 
         action_result.add_data({})
 
         # Add a dictionary that is made up of the most important values from data into the summary
         summary = action_result.update_summary({})
-        summary["total_cases"] = response.get("header", {}).get("totalResult")
+        summary["total_cases"] = total_cases
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
