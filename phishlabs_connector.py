@@ -290,9 +290,11 @@ class PhishlabsConnector(BaseConnector):
                 # so just return from here
                 return action_result.get_status()
 
-            page = response["data"]
+            page = response.get("data") if isinstance(response, dict) else None
+            if not isinstance(page, list) or not all(isinstance(item, dict) for item in page):
+                return action_result.set_status(phantom.APP_ERROR, "PhishLabs returned invalid case data")
             for item in page:
-                if str(item["dateClosed"]) == "0001-01-01T00:00:00Z":
+                if str(item.get("dateClosed")) == "0001-01-01T00:00:00Z":
                     item["dateClosed"] = None
                 action_result.add_data(item)
 
