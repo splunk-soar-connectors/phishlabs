@@ -45,8 +45,8 @@ def _serve_response(
             self.end_headers()
             self.wfile.write(response_body)
 
-        def log_message(self, format: str, *args: object) -> None:
-            del format, args
+        def log_message(self, fmt: str, *args: object) -> None:
+            del fmt, args
 
     server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
     thread = Thread(target=server.serve_forever, daemon=True)
@@ -79,8 +79,8 @@ def _serve_post_response(
             self.end_headers()
             self.wfile.write(response_body)
 
-        def log_message(self, format: str, *args: object) -> None:
-            del format, args
+        def log_message(self, fmt: str, *args: object) -> None:
+            del fmt, args
 
     server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
     thread = Thread(target=server.serve_forever, daemon=True)
@@ -111,8 +111,8 @@ def _serve_get_pages(
             self.end_headers()
             self.wfile.write(response_body)
 
-        def log_message(self, format: str, *args: object) -> None:
-            del format, args
+        def log_message(self, fmt: str, *args: object) -> None:
+            del fmt, args
 
     server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
     thread = Thread(target=server.serve_forever, daemon=True)
@@ -143,8 +143,8 @@ def _serve_get_routes(
             self.end_headers()
             self.wfile.write(response_body)
 
-        def log_message(self, format: str, *args: object) -> None:
-            del format, args
+        def log_message(self, fmt: str, *args: object) -> None:
+            del fmt, args
 
     server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
     thread = Thread(target=server.serve_forever, daemon=True)
@@ -160,16 +160,16 @@ def _serve_get_routes(
 
 def test_request_uses_basic_auth_and_cases_path() -> None:
     username = "test-user"
-    password = "test-password"
-    expected_auth = "Basic " + base64.b64encode(
-        f"{username}:{password}".encode()
-    ).decode()
+    credential_value = "pw"
+    expected_auth = (
+        "Basic " + base64.b64encode(f"{username}:{credential_value}".encode()).decode()
+    )
 
     with _serve_response(200, "application/json", '{"cases": []}') as (
         base_url,
         observed_requests,
     ):
-        client = PhishLabsClient(username, password, base_url=base_url)
+        client = PhishLabsClient(username, credential_value, base_url=base_url)
         response = client.request("get", "/data/cases")
 
     assert process_response(response) == {"cases": []}
@@ -267,9 +267,10 @@ def test_create_case_posts_legacy_body_and_returns_created_case_summary() -> Non
         )
 
     assert observed_requests[0][0] == "/create/newCase"
-    assert observed_requests[0][1] == "Basic " + base64.b64encode(
-        b"test-user:test-password"
-    ).decode()
+    assert (
+        observed_requests[0][1]
+        == "Basic " + base64.b64encode(b"test-user:test-password").decode()
+    )
     assert json.loads(observed_requests[0][2]) == {
         "newCase": {
             "title": "A test case",
@@ -313,7 +314,9 @@ def test_create_case_rejects_unconfirmed_creation_without_exposing_body() -> Non
         json.dumps({"message": private_detail, "createdCase": {"status": "New"}}),
     ) as (base_url, _observed_requests):
         client = PhishLabsClient("test-user", "test-password", base_url=base_url)
-        with pytest.raises(PhishLabsAPIError, match="did not confirm ticket creation") as error:
+        with pytest.raises(
+            PhishLabsAPIError, match="did not confirm ticket creation"
+        ) as error:
             create_case(
                 client,
                 title="A test case",
@@ -365,9 +368,7 @@ def test_fetch_cases_validates_pages_and_headers(body: str, message: str) -> Non
 
 
 def test_fetch_cases_stops_at_the_page_safety_limit() -> None:
-    page = json.dumps(
-        {"data": [{"caseId": "case-1"}], "header": {"totalResult": 3}}
-    )
+    page = json.dumps({"data": [{"caseId": "case-1"}], "header": {"totalResult": 3}})
     with _serve_get_pages([page]) as (base_url, observed_requests):
         client = PhishLabsClient("test-user", "test-password", base_url=base_url)
         with pytest.raises(PhishLabsAPIError, match="safety limit"):

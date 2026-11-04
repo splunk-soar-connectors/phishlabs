@@ -101,7 +101,10 @@ class GetTicketOutput(ActionOutput):
 
 
 class GetTicketSummary(ActionOutput):
-    case_id: str = OutputField(example_values=["c88dc75c-1756-11e8-8a25-0a799650b9c8"])
+    case_id: str = OutputField(
+        cef_types=["phishlabs case id"],
+        example_values=["c88dc75c-1756-11e8-8a25-0a799650b9c8"],
+    )
     return_result: float | None = OutputField(example_values=[1])
     total_result: float | None = OutputField(example_values=[1])
 
