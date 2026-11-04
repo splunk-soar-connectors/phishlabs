@@ -136,9 +136,6 @@ action_result.summary.status | string | | New |
 action_result.message | string | | Status: New, Case id: c88dc75c-1756-11e8-8a25-0a799650b9c8, Case number: 714441 |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
-action_result.data.\*.updatedCase.caseId | string | | dbf4a861-2b1a-11ec-b1c8-0efb1918365c |
-action_result.data.\*.updatedCase.status | string | | New |
-action_result.data.\*.updatedCase.caseNumber | numeric | | 2648042 |
 
 ## action: 'list tickets'
 
