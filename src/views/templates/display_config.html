@@ -35,13 +35,19 @@ limitations under the License.
   }
 </style>
 <div class="phishlabs-app"
-     style="overflow: auto; width: 100%; height: 100%; padding-left: 10px; padding-right: 10px">
+     style="overflow: auto;
+            width: 100%;
+            height: 100%;
+            padding-left: 10px;
+            padding-right: 10px">
   {% for result in results %}
     <br>
     <h3 class="wf-h3-style">Info</h3>
     {% if result.brands %}
       <table class="wf-table-horizontal">
-        <tr><th>BRAND</th></tr>
+        <tr>
+          <th>BRAND</th>
+        </tr>
         {% for brand in result.brands %}
           <tr>
             <td>
@@ -59,7 +65,9 @@ limitations under the License.
     <br>
     {% if result.case_types %}
       <table class="wf-table-horizontal">
-        <tr><th>CASE TYPE</th></tr>
+        <tr>
+          <th>CASE TYPE</th>
+        </tr>
         {% for case_type in result.case_types %}
           <tr>
             <td>

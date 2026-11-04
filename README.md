@@ -78,7 +78,7 @@ action_result.parameter.brand | string | `phishlabs brand` | |
 action_result.data.\*.createdCase.caseId | string | `phishlabs case id` | c88dc75c-1756-11e8-8a25-0a799650b9c8 |
 action_result.data.\*.createdCase.caseNumber | numeric | | 714441 |
 action_result.data.\*.createdCase.status | string | | New |
-action_result.summary.case_id | string | | c88dc75c-1756-11e8-8a25-0a799650b9c8 |
+action_result.summary.case_id | string | `phishlabs case id` | c88dc75c-1756-11e8-8a25-0a799650b9c8 |
 action_result.summary.case_number | numeric | | 714441 |
 action_result.summary.status | string | | New |
 summary.total_objects | numeric | | 1 |
@@ -138,7 +138,7 @@ action_result.data.\*.sourcePhishlabs | boolean | | True False |
 action_result.data.\*.primaryMarketplace | boolean | | True False |
 action_result.data.\*.crimewareLoadFailure | boolean | | True False |
 action_result.data.\*.resolution | string | | This is a test case |
-action_result.summary.case_id | string | | c88dc75c-1756-11e8-8a25-0a799650b9c8 |
+action_result.summary.case_id | string | `phishlabs case id` | c88dc75c-1756-11e8-8a25-0a799650b9c8 |
 action_result.summary.return_result | numeric | | 1 |
 action_result.summary.total_result | numeric | | 1 |
 summary.total_objects | numeric | | 1 |

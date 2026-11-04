@@ -19,7 +19,12 @@ from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Params
 
 from ..app import Asset
-from ..client import PhishLabsAPIError, PhishLabsClient, PhishLabsError, process_response
+from ..client import (
+    PhishLabsAPIError,
+    PhishLabsClient,
+    PhishLabsError,
+    process_response,
+)
 
 MAX_PAGE_COUNT = 500
 OPEN_DATE_SENTINEL = "0001-01-01T00:00:00Z"
@@ -131,11 +136,11 @@ def fetch_cases(
 
     for _ in range(max_page_count):
         query = {"offset": offset} if offset else None
-        response = process_response(
-            client.request("get", "/data/cases", params=query)
-        )
+        response = process_response(client.request("get", "/data/cases", params=query))
         page = response.get("data") if isinstance(response, dict) else None
-        if not isinstance(page, list) or not all(isinstance(item, dict) for item in page):
+        if not isinstance(page, list) or not all(
+            isinstance(item, dict) for item in page
+        ):
             raise PhishLabsAPIError("PhishLabs returned invalid case data")
 
         for item in page:

@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Any, cast
+from typing import cast
 
 from pydantic import Field
 from soar_sdk.abstract import SOARClient
@@ -20,7 +20,12 @@ from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Params
 
 from ..app import Asset
-from ..client import PhishLabsAPIError, PhishLabsClient, PhishLabsError, process_response
+from ..client import (
+    PhishLabsAPIError,
+    PhishLabsClient,
+    PhishLabsError,
+    process_response,
+)
 
 
 class BrandsOutput(ActionOutput):
@@ -51,7 +56,9 @@ def fetch_config(
 ) -> tuple[GetConfigOutput, dict[str, int]] | ActionResult:
     """Fetch configuration, preserving brands if the second request fails."""
     brand_response = process_response(client.request("get", "/create/brands"))
-    brand_list = brand_response.get("brands") if isinstance(brand_response, dict) else None
+    brand_list = (
+        brand_response.get("brands") if isinstance(brand_response, dict) else None
+    )
     if not isinstance(brand_list, list):
         raise PhishLabsAPIError("PhishLabs returned invalid brand data")
     brand_values = [{"name": str(brand)} for brand in brand_list]
@@ -87,14 +94,10 @@ def config_message(summary: dict[str, int]) -> str:
     )
 
 
-def get_config(
-    params: Params, soar: SOARClient, asset: Asset
-) -> GetConfigOutput:
+def get_config(params: Params, soar: SOARClient, asset: Asset) -> GetConfigOutput:
     """Return the vendor's configured brands and case types."""
     try:
-        result = fetch_config(
-            PhishLabsClient(asset.username, asset.password), params
-        )
+        result = fetch_config(PhishLabsClient(asset.username, asset.password), params)
     except PhishLabsError as error:
         raise ActionFailure(str(error)) from error
 

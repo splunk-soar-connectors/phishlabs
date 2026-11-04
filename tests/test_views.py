@@ -33,7 +33,10 @@ def _render_get_config(result: ActionResult) -> str:
         "get_config",
         [
             (
-                {"total_objects": 1, "total_objects_successful": int(result.get_status())},
+                {
+                    "total_objects": 1,
+                    "total_objects_successful": int(result.get_status()),
+                },
                 [result],
             )
         ],
@@ -146,6 +149,13 @@ def test_registered_action_metadata_matches_legacy_contract() -> None:
         assert expected["output_paths"].issubset(
             {output["data_path"] for output in metadata["output"]}
         )
+        if action_name in {"create_ticket", "get_ticket"}:
+            case_id_summary = next(
+                output
+                for output in metadata["output"]
+                if output["data_path"] == "action_result.summary.case_id"
+            )
+            assert case_id_summary["contains"] == ["phishlabs case id"]
         if action_name == "create_ticket":
             assert not any(
                 output["data_path"].startswith("action_result.data.*.updatedCase.")

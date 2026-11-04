@@ -19,7 +19,12 @@ from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Param, Params
 
 from ..app import Asset
-from ..client import PhishLabsAPIError, PhishLabsClient, PhishLabsError, process_response
+from ..client import (
+    PhishLabsAPIError,
+    PhishLabsClient,
+    PhishLabsError,
+    process_response,
+)
 
 
 class CreateTicketParams(Params):
@@ -48,7 +53,10 @@ class CreateTicketOutput(ActionOutput):
 
 
 class CreateTicketSummary(ActionOutput):
-    case_id: str = OutputField(example_values=["c88dc75c-1756-11e8-8a25-0a799650b9c8"])
+    case_id: str = OutputField(
+        cef_types=["phishlabs case id"],
+        example_values=["c88dc75c-1756-11e8-8a25-0a799650b9c8"],
+    )
     case_number: float = OutputField(example_values=[714441])
     status: str = OutputField(example_values=["New"])
 
