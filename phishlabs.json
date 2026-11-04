@@ -588,27 +588,6 @@
                     "example_values": [
                         1
                     ]
-                },
-                {
-                    "data_path": "action_result.data.*.updatedCase.caseId",
-                    "data_type": "string",
-                    "example_values": [
-                        "dbf4a861-2b1a-11ec-b1c8-0efb1918365c"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.updatedCase.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "New"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.updatedCase.caseNumber",
-                    "data_type": "numeric",
-                    "example_values": [
-                        2648042
-                    ]
                 }
             ],
             "render": {
