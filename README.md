@@ -1,4 +1,4 @@
-# phishlabs
+# PhishLabs
 
 Publisher: Splunk <br>
 Connector Version: 2.0.9 <br>
@@ -10,18 +10,18 @@ This app implements investigative actions on the PhishLabs Casetracker Portal
 
 ### Configuration variables
 
-This table lists the configuration variables required to operate phishlabs. These variables are specified when configuring a PhishLabs asset in Splunk SOAR.
+This table lists the configuration variables required to operate PhishLabs. These variables are specified when configuring a PhishLabs asset in Splunk SOAR.
 
 VARIABLE | REQUIRED | TYPE | DESCRIPTION
 -------- | -------- | ---- | -----------
 **username** | required | string | Username |
-**password** | required | string | Password |
+**password** | required | password | Password |
 
 ### Supported Actions
 
 [test connectivity](#action-test-connectivity) - test connectivity <br>
-[get ticket](#action-get-ticket) - Get case (issue) information <br>
 [create ticket](#action-create-ticket) - Create a new case submission <br>
+[get ticket](#action-get-ticket) - Get case (issue) information <br>
 [list tickets](#action-list-tickets) - Get a list of cases in PhishLabs <br>
 [get config](#action-get-config) - Return the list of brands and case types currently configured in PhishLabs
 
@@ -47,12 +47,49 @@ action_result.message | string | | |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 
+## action: 'create ticket'
+
+Create a new case submission
+
+Type: **generic** <br>
+Read only: **False**
+
+#### Action Parameters
+
+PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
+--------- | -------- | ----------- | ---- | --------
+**title** | required | Title | string | |
+**url** | optional | URL | string | `url` |
+**description** | optional | Description of the case | string | |
+**case_type** | required | Type of case | string | `phishlabs case type` |
+**brand** | required | Brand for the case | string | `phishlabs brand` |
+
+#### Action Output
+
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string | | success failure |
+action_result.message | string | | |
+action_result.parameter.title | string | | |
+action_result.parameter.url | string | `url` | |
+action_result.parameter.description | string | | |
+action_result.parameter.case_type | string | `phishlabs case type` | |
+action_result.parameter.brand | string | `phishlabs brand` | |
+action_result.data.\*.createdCase.caseId | string | `phishlabs case id` | c88dc75c-1756-11e8-8a25-0a799650b9c8 |
+action_result.data.\*.createdCase.caseNumber | numeric | | 714441 |
+action_result.data.\*.createdCase.status | string | | New |
+action_result.summary.case_id | string | | c88dc75c-1756-11e8-8a25-0a799650b9c8 |
+action_result.summary.case_number | numeric | | 714441 |
+action_result.summary.status | string | | New |
+summary.total_objects | numeric | | 1 |
+summary.total_objects_successful | numeric | | 1 |
+
 ## action: 'get ticket'
 
 Get case (issue) information
 
 Type: **generic** <br>
-Read only: **False**
+Read only: **True**
 
 #### Action Parameters
 
@@ -101,43 +138,9 @@ action_result.data.\*.sourcePhishlabs | boolean | | True False |
 action_result.data.\*.primaryMarketplace | boolean | | True False |
 action_result.data.\*.crimewareLoadFailure | boolean | | True False |
 action_result.data.\*.resolution | string | | This is a test case |
-summary.total_objects | numeric | | 1 |
-summary.total_objects_successful | numeric | | 1 |
-
-## action: 'create ticket'
-
-Create a new case submission
-
-Type: **generic** <br>
-Read only: **False**
-
-#### Action Parameters
-
-PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
---------- | -------- | ----------- | ---- | --------
-**title** | required | Title | string | |
-**url** | optional | URL | string | `url` |
-**description** | optional | Description of the case | string | |
-**case_type** | required | Type of case | string | `phishlabs case type` |
-**brand** | required | Brand for the case | string | `phishlabs brand` |
-
-#### Action Output
-
-DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
---------- | ---- | -------- | --------------
-action_result.status | string | | success failure |
-action_result.message | string | | |
-action_result.parameter.title | string | | |
-action_result.parameter.url | string | `url` | |
-action_result.parameter.description | string | | |
-action_result.parameter.case_type | string | `phishlabs case type` | |
-action_result.parameter.brand | string | `phishlabs brand` | |
-action_result.data.\*.createdCase.caseId | string | `phishlabs case id` | c88dc75c-1756-11e8-8a25-0a799650b9c8 |
-action_result.data.\*.createdCase.caseNumber | numeric | | 714441 |
-action_result.data.\*.createdCase.status | string | | New |
-action_result.data.\*.updatedCase.caseId | string | | dbf4a861-2b1a-11ec-b1c8-0efb1918365c |
-action_result.data.\*.updatedCase.status | string | | New |
-action_result.data.\*.updatedCase.caseNumber | numeric | | 2648042 |
+action_result.summary.case_id | string | | c88dc75c-1756-11e8-8a25-0a799650b9c8 |
+action_result.summary.return_result | numeric | | 1 |
+action_result.summary.total_result | numeric | | 1 |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 
@@ -146,7 +149,7 @@ summary.total_objects_successful | numeric | | 1 |
 Get a list of cases in PhishLabs
 
 Type: **generic** <br>
-Read only: **False**
+Read only: **True**
 
 #### Action Parameters
 
@@ -205,6 +208,7 @@ action_result.data.\*.caseLinks.\*.linkType | string | | Clone |
 action_result.data.\*.caseLinks.\*.caseNumber | numeric | | 2639769 |
 action_result.data.\*.caseLinks.\*.caseStatus | string | | Rejected |
 action_result.data.\*.caseLinks.\*.linkCreated | string | | 2021-10-11T13:48:55.568376569Z |
+action_result.summary.total_cases | numeric | | 42 |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 
@@ -213,7 +217,7 @@ summary.total_objects_successful | numeric | | 1 |
 Return the list of brands and case types currently configured in PhishLabs
 
 Type: **investigate** <br>
-Read only: **False**
+Read only: **True**
 
 #### Action Parameters
 
@@ -227,6 +231,8 @@ action_result.status | string | | success failure |
 action_result.message | string | | |
 action_result.data.\*.brands.\*.name | string | `phishlabs brand` | BRAND1 |
 action_result.data.\*.case_types.\*.name | string | `phishlabs case type` | Phishing |
+action_result.summary.num_brands | numeric | | 3 |
+action_result.summary.num_case_types | numeric | | 4 |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 

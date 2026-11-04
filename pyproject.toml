@@ -3,15 +3,19 @@ name = "phishlabs"
 version = "2.0.9"
 description = "This app implements investigative actions on the PhishLabs Casetracker Portal"
 license = "Copyright (c) 2018-2026 Splunk Inc."
-requires-python = ">=3.13, <3.16, !=3.14.*"
+requires-python = ">=3.13, <3.14"
 authors = [
 ]
 dependencies = [
+    "requests>=2.34.2",
     "splunk-soar-sdk==7.1.1",
 ]
 
 [tool.soar.app]
 main_module = "src.app:app"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
 
 ### YOU SHOULD NOT NEED TO TOUCH ANYTHING BELOW THIS LINE ###
 
@@ -35,14 +39,9 @@ environments = [
     "sys_platform == 'linux' and platform_machine == 'aarch64' and python_version == '3.13'",
     "sys_platform == 'darwin' and platform_machine == 'x86_64' and python_version == '3.13'",
     "sys_platform == 'darwin' and platform_machine == 'arm64' and python_version == '3.13'",
-    "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.15'",
-    "sys_platform == 'linux' and platform_machine == 'aarch64' and python_version == '3.15'",
-    "sys_platform == 'darwin' and platform_machine == 'x86_64' and python_version == '3.15'",
-    "sys_platform == 'darwin' and platform_machine == 'arm64' and python_version == '3.15'",
 ]
 required-environments = [
     "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.13'",
-    "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.15'",
 ]
 
 [tool.ruff]
