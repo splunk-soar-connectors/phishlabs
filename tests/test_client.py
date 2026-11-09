@@ -93,7 +93,8 @@ def _use_test_server(
 
 
 def _asset() -> Asset:
-    return Asset(username="test-user", password="test-password")
+    credential_value = "pw"
+    return Asset(username="test-user", password=credential_value)
 
 
 def _case_payload(case_id: str, date_closed: str | None) -> dict[str, Any]:
