@@ -118,6 +118,9 @@ action_result.parameter.brand | string | `phishlabs brand` | |
 action_result.data.\*.createdCase.caseId | string | `phishlabs case id` | c88dc75c-1756-11e8-8a25-0a799650b9c8 |
 action_result.data.\*.createdCase.caseNumber | numeric | | 714441 |
 action_result.data.\*.createdCase.status | string | | New |
+action_result.data.\*.updatedCase.caseId | string | | c88dc75c-1756-11e8-8a25-0a799650b9c8 |
+action_result.data.\*.updatedCase.caseNumber | numeric | | 714441 |
+action_result.data.\*.updatedCase.status | string | | New |
 action_result.summary.case_id | string | `phishlabs case id` | c88dc75c-1756-11e8-8a25-0a799650b9c8 |
 action_result.summary.case_number | numeric | | 714441 |
 action_result.summary.status | string | | New |

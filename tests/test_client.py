@@ -153,7 +153,7 @@ def test_list_tickets_uses_basic_auth_and_legacy_summary(
         _use_test_server(monkeypatch, list_tickets_module, base_url)
         result = list_tickets(Params(), app_module.app.soar_client, _asset())
 
-    expected_auth = "Basic " + base64.b64encode(b"test-user:test-password").decode()
+    expected_auth = "Basic " + base64.b64encode(b"test-user:pw").decode()
     assert result == []
     assert observed == [("GET", "/data/cases", expected_auth, b"")]
     assert app_module.app.soar_client.get_summary().total_cases == 0
@@ -285,7 +285,11 @@ def test_create_ticket_sends_legacy_body_and_summary(
                 "caseNumber": 714441,
                 "status": "New",
             },
-            "updatedCase": {"caseId": "must-not-be-returned"},
+            "updatedCase": {
+                "caseId": "updated-case-456",
+                "caseNumber": 714442,
+                "status": "Updated",
+            },
         }
     )
     with _serve({"/create/newCase": (200, body)}) as (base_url, observed):
@@ -303,10 +307,7 @@ def test_create_ticket_sends_legacy_body_and_summary(
         )
 
     assert observed[0][0:2] == ("POST", "/create/newCase")
-    assert (
-        observed[0][2]
-        == "Basic " + base64.b64encode(b"test-user:test-password").decode()
-    )
+    assert observed[0][2] == "Basic " + base64.b64encode(b"test-user:pw").decode()
     assert json.loads(observed[0][3]) == {
         "newCase": {
             "title": "A test case",
@@ -321,7 +322,12 @@ def test_create_ticket_sends_legacy_body_and_summary(
             "caseId": "case-123",
             "caseNumber": 714441.0,
             "status": "New",
-        }
+        },
+        "updatedCase": {
+            "caseId": "updated-case-456",
+            "caseNumber": 714442.0,
+            "status": "Updated",
+        },
     }
     assert app_module.app.soar_client.get_summary().case_id == "case-123"
 

@@ -102,6 +102,9 @@ def test_registered_action_metadata_matches_legacy_contract() -> None:
                 "action_result.data.*.createdCase.caseId",
                 "action_result.data.*.createdCase.caseNumber",
                 "action_result.data.*.createdCase.status",
+                "action_result.data.*.updatedCase.caseId",
+                "action_result.data.*.updatedCase.status",
+                "action_result.data.*.updatedCase.caseNumber",
                 "action_result.summary.case_id",
                 "action_result.summary.case_number",
                 "action_result.summary.status",
@@ -156,8 +159,3 @@ def test_registered_action_metadata_matches_legacy_contract() -> None:
                 if output["data_path"] == "action_result.summary.case_id"
             )
             assert case_id_summary["contains"] == ["phishlabs case id"]
-        if action_name == "create_ticket":
-            assert not any(
-                output["data_path"].startswith("action_result.data.*.updatedCase.")
-                for output in metadata["output"]
-            )

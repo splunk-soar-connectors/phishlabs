@@ -50,8 +50,17 @@ class CreatedcaseOutput(ActionOutput):
     status: str = OutputField(example_values=["New"])
 
 
+class UpdatedcaseOutput(ActionOutput):
+    caseId: str | None = OutputField(
+        example_values=["c88dc75c-1756-11e8-8a25-0a799650b9c8"]
+    )
+    caseNumber: float | None = OutputField(example_values=[714441])
+    status: str | None = OutputField(example_values=["New"])
+
+
 class CreateTicketOutput(ActionOutput):
     createdCase: CreatedcaseOutput
+    updatedCase: UpdatedcaseOutput | None = None
 
 
 class CreateTicketSummary(ActionOutput):
@@ -108,7 +117,10 @@ def create_ticket(
     if not isinstance(created_case, dict) or not created_case.get("caseId"):
         raise ActionFailure("PhishLabs did not confirm ticket creation")
 
-    output = CreateTicketOutput(createdCase=created_case)
+    updated_case = (
+        response_data.get("updatedCase") if isinstance(response_data, dict) else None
+    )
+    output = CreateTicketOutput(createdCase=created_case, updatedCase=updated_case)
     summary = CreateTicketSummary(
         status=created_case.get("status"),
         case_id=created_case.get("caseId"),

@@ -50,8 +50,8 @@ class GetConfigOutput(ActionOutput):
 
 
 class GetConfigSummary(ActionOutput):
-    num_brands: float = OutputField(example_values=[3])
-    num_case_types: float = OutputField(example_values=[4])
+    num_brands: int = OutputField(example_values=[3])
+    num_case_types: int = OutputField(example_values=[4])
 
 
 def get_config(params: Params, soar: SOARClient, asset: Asset) -> GetConfigOutput:
