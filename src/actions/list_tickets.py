@@ -40,19 +40,6 @@ class CreatedbyOutput(ActionOutput):
     organization: str = OutputField(example_values=["Splunk"])
 
 
-class QueryparamsOutput(ActionOutput):
-    format: str = OutputField(example_values=["json"])
-
-
-class HeaderOutput(ActionOutput):
-    id: str = OutputField(example_values=["ef7d1b80-1756-11e8-822a-0a8e0de89b4e"])
-    queryParams: QueryparamsOutput
-    requestDate: str = OutputField(example_values=["2018-02-21T22:31:18.738015606Z"])
-    returnResult: float = OutputField(example_values=[42])
-    totalResult: float = OutputField(example_values=[42])
-    user: str = OutputField(example_values=["user"])
-
-
 class NotesOutput(ActionOutput):
     author: str = OutputField(example_values=["soc"])
     dateCreated: str = OutputField(example_values=["2018-02-21T03:24:14Z"])
@@ -111,19 +98,18 @@ class ListTicketsOutput(ActionOutput):
         example_values=["This is my description\n\nhttp://suspiciousurl.com/1"]
     )
     formReceiver: bool = OutputField(example_values=[True])
-    header: HeaderOutput
-    notes: list[NotesOutput]
-    resolutionStatus: str
+    notes: list[NotesOutput] | None = OutputField()
+    resolutionStatus: str | None = OutputField()
     title: str = OutputField(example_values=["my_case_title"])
-    appDate: str = OutputField(example_values=["0001-01-01T00:00:00Z"])
-    sourceName: str = OutputField(example_values=["Client Submitted (CCAPI)"])
-    brandAbuseFlag: bool
-    sourcePhishlabs: bool
-    primaryMarketplace: bool
-    crimewareLoadFailure: bool
-    attachments: list[AttachmentsOutput]
-    resolution: str = OutputField(example_values=["This is a test case."])
-    caseLinks: list[CaselinksOutput]
+    appDate: str | None = OutputField(example_values=["0001-01-01T00:00:00Z"])
+    sourceName: str | None = OutputField(example_values=["Client Submitted (CCAPI)"])
+    brandAbuseFlag: bool | None = OutputField(example_values=[True, False])
+    sourcePhishlabs: bool | None = OutputField(example_values=[True, False])
+    primaryMarketplace: bool | None = OutputField(example_values=[True, False])
+    crimewareLoadFailure: bool | None = OutputField(example_values=[True, False])
+    attachments: list[AttachmentsOutput] | None = OutputField()
+    resolution: str | None = OutputField(example_values=["This is a test case."])
+    caseLinks: list[CaselinksOutput] | None = OutputField()
 
 
 class ListTicketsSummary(ActionOutput):

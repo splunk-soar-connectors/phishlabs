@@ -43,19 +43,6 @@ class CreatedbyOutput(ActionOutput):
     organization: str = OutputField(example_values=["Splunk"])
 
 
-class QueryparamsOutput(ActionOutput):
-    format: str = OutputField(example_values=["json"])
-
-
-class HeaderOutput(ActionOutput):
-    id: str = OutputField(example_values=["e08b33e0-1756-11e8-bd82-0a799650b9c8"])
-    queryParams: QueryparamsOutput
-    requestDate: str = OutputField(example_values=["2018-02-21T22:30:53.664564894Z"])
-    returnResult: float = OutputField(example_values=[1])
-    totalResult: float = OutputField(example_values=[1])
-    user: str = OutputField(example_values=["user"])
-
-
 class NotesOutput(ActionOutput):
     author: str = OutputField(example_values=["soap.api"])
     dateCreated: str = OutputField(example_values=["2018-03-12T08:48:05Z"])
@@ -87,19 +74,18 @@ class GetTicketOutput(ActionOutput):
         example_values=["This is my description\n\nhttp://suspiciousurl.com/1"]
     )
     formReceiver: bool = OutputField(example_values=[True])
-    header: HeaderOutput
-    notes: list[NotesOutput]
-    resolutionStatus: str = OutputField(
+    notes: list[NotesOutput] | None = OutputField()
+    resolutionStatus: str | None = OutputField(
         example_values=["No malicious content, referred to client."]
     )
     title: str = OutputField(example_values=["my_case_title"])
-    appDate: str = OutputField(example_values=["0001-01-01T00:00:00Z"])
-    sourceName: str = OutputField(example_values=["Client Submitted (CCAPI)"])
-    brandAbuseFlag: bool
-    sourcePhishlabs: bool
-    primaryMarketplace: bool
-    crimewareLoadFailure: bool
-    resolution: str = OutputField(example_values=["This is a test case"])
+    appDate: str | None = OutputField(example_values=["0001-01-01T00:00:00Z"])
+    sourceName: str | None = OutputField(example_values=["Client Submitted (CCAPI)"])
+    brandAbuseFlag: bool | None = OutputField(example_values=[True, False])
+    sourcePhishlabs: bool | None = OutputField(example_values=[True, False])
+    primaryMarketplace: bool | None = OutputField(example_values=[True, False])
+    crimewareLoadFailure: bool | None = OutputField(example_values=[True, False])
+    resolution: str | None = OutputField(example_values=["This is a test case"])
 
 
 class GetTicketSummary(ActionOutput):

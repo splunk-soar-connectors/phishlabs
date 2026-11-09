@@ -116,14 +116,6 @@ def _case_payload(case_id: str, date_closed: str | None) -> dict[str, Any]:
         "dateModified": "2018-02-21T22:30:13Z",
         "description": "test case",
         "formReceiver": True,
-        "header": {
-            "id": "header-id",
-            "queryParams": {"format": "json"},
-            "requestDate": "2018-02-21T22:30:53Z",
-            "returnResult": 1,
-            "totalResult": 1,
-            "user": "user",
-        },
         "notes": [],
         "resolutionStatus": "Open",
         "title": "test case",
@@ -178,6 +170,12 @@ def test_list_tickets_paginates_and_normalizes_open_case_dates(
 ) -> None:
     first = _list_case_payload("case-1", "0001-01-01T00:00:00Z")
     second = _list_case_payload("case-2", "2021-10-01T00:00:00Z")
+    for case in (first, second):
+        case.pop("notes")
+        case.pop("resolutionStatus")
+        case.pop("crimewareLoadFailure")
+        case.pop("attachments")
+        case.pop("caseLinks")
     routes = {
         "/data/cases": (
             200,
@@ -255,6 +253,8 @@ def test_get_ticket_returns_case_and_legacy_summary(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     case = _case_payload("case-123", "0001-01-01T00:00:00Z")
+    case.pop("notes")
+    case.pop("crimewareLoadFailure")
     body = json.dumps(
         {
             "data": [case, {**case, "caseId": "unrequested-case"}],
@@ -271,6 +271,8 @@ def test_get_ticket_returns_case_and_legacy_summary(
 
     assert result.caseId == "case-123"
     assert result.dateClosed is None
+    assert result.notes is None
+    assert result.crimewareLoadFailure is None
     assert observed[0][1] == "/data/cases/case-123"
     assert app_module.app.soar_client.get_summary().return_result == 1
 

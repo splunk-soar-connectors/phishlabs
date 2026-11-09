@@ -162,12 +162,6 @@ action_result.data.\*.dateCreated | string | | 2018-02-21T22:30:13Z |
 action_result.data.\*.dateModified | string | | 2018-02-21T22:30:13Z |
 action_result.data.\*.description | string | | This is my description http://suspiciousurl.com/1 |
 action_result.data.\*.formReceiver | boolean | | True False |
-action_result.data.\*.header.id | string | | e08b33e0-1756-11e8-bd82-0a799650b9c8 |
-action_result.data.\*.header.queryParams.format | string | | json |
-action_result.data.\*.header.requestDate | string | | 2018-02-21T22:30:53.664564894Z |
-action_result.data.\*.header.returnResult | numeric | | 1 |
-action_result.data.\*.header.totalResult | numeric | | 1 |
-action_result.data.\*.header.user | string | | user |
 action_result.data.\*.notes.\*.author | string | | soap.api |
 action_result.data.\*.notes.\*.dateCreated | string | | 2018-03-12T08:48:05Z |
 action_result.data.\*.notes.\*.dateModified | string | | 2018-03-12T08:48:05Z |
@@ -219,12 +213,6 @@ action_result.data.\*.dateCreated | string | | 2018-02-21T22:30:13Z |
 action_result.data.\*.dateModified | string | | 2018-02-21T22:30:13Z |
 action_result.data.\*.description | string | | This is my description http://suspiciousurl.com/1 |
 action_result.data.\*.formReceiver | boolean | | True False |
-action_result.data.\*.header.id | string | | ef7d1b80-1756-11e8-822a-0a8e0de89b4e |
-action_result.data.\*.header.queryParams.format | string | | json |
-action_result.data.\*.header.requestDate | string | | 2018-02-21T22:31:18.738015606Z |
-action_result.data.\*.header.returnResult | numeric | | 42 |
-action_result.data.\*.header.totalResult | numeric | | 42 |
-action_result.data.\*.header.user | string | | user |
 action_result.data.\*.notes.\*.author | string | | soc |
 action_result.data.\*.notes.\*.dateCreated | string | | 2018-02-21T03:24:14Z |
 action_result.data.\*.notes.\*.dateModified | string | | 2018-02-21T03:24:14Z |
