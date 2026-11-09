@@ -81,7 +81,8 @@ def get_config(params: Params, soar: SOARClient, asset: Asset) -> GetConfigOutpu
         raise ActionFailure("PhishLabs returned invalid brand data")
     brand_values = [{"name": str(brand)} for brand in brand_list]
 
-    # Keep this SDK's single-output annotation; its runtime still accepts ActionResult.
+    # ActionResult marks this partial response as failed while retaining brands
+    # fetched above; raising ActionFailure would discard that useful data.
     try:
         case_type_response = httpx.get(
             f"{BASE_URL}/create/caseTypes",

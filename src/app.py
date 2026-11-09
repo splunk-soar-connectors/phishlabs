@@ -36,6 +36,8 @@ def create_phishlabs_app() -> App:
         encrypt_ingest_state=True,
         asset_cls=Asset,
         python_version="3.13",
+        # SDK conversion intentionally raises the approved minimum from legacy 5.1.0
+        # to 7.0.0.
         min_phantom_version="7.0.0",
     )
 
