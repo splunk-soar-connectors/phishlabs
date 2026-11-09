@@ -13,18 +13,21 @@
 # limitations under the License.
 from typing import cast
 
+import httpx
 from pydantic import Field
 from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import ActionOutput, ActionResult, OutputField
 from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Params
 
-from ..app import Asset
-from ..client import (
+from ..asset import Asset
+from ..auth import basic_auth
+from .utils import (
+    BASE_URL,
+    DEFAULT_TIMEOUT,
     PhishLabsAPIError,
-    PhishLabsClient,
-    PhishLabsError,
-    process_response,
+    http_status_message,
+    response_json,
 )
 
 
@@ -51,60 +54,73 @@ class GetConfigSummary(ActionOutput):
     num_case_types: float = OutputField(example_values=[4])
 
 
-def fetch_config(
-    client: PhishLabsClient, params: Params
-) -> tuple[GetConfigOutput, dict[str, int]] | ActionResult:
-    """Fetch configuration, preserving brands if the second request fails."""
-    brand_response = process_response(client.request("get", "/create/brands"))
-    brand_list = (
-        brand_response.get("brands") if isinstance(brand_response, dict) else None
-    )
-    if not isinstance(brand_list, list):
-        raise PhishLabsAPIError("PhishLabs returned invalid brand data")
-    brand_values = [{"name": str(brand)} for brand in brand_list]
+def get_config(params: Params, soar: SOARClient, asset: Asset) -> GetConfigOutput:
+    """Return configured brands and case types, retaining brands on a second-call failure."""
+    del params
+    try:
+        brand_response = httpx.get(
+            f"{BASE_URL}/create/brands",
+            auth=basic_auth(asset.username, asset.password),
+            timeout=DEFAULT_TIMEOUT,
+            follow_redirects=True,
+        )
+        brand_response.raise_for_status()
+    except httpx.HTTPStatusError as error:
+        brand_response = error.response
+        if not 200 <= brand_response.status_code < 399:
+            raise ActionFailure(http_status_message(brand_response)) from error
+    except httpx.RequestError as error:
+        raise ActionFailure("Unable to connect to PhishLabs") from error
 
     try:
-        case_type_response = process_response(
-            client.request("get", "/create/caseTypes")
+        brand_data = response_json(brand_response)
+    except PhishLabsAPIError as error:
+        raise ActionFailure(str(error)) from error
+    brand_list = brand_data.get("brands") if isinstance(brand_data, dict) else None
+    if not isinstance(brand_list, list):
+        raise ActionFailure("PhishLabs returned invalid brand data")
+    brand_values = [{"name": str(brand)} for brand in brand_list]
+
+    # Keep this SDK's single-output annotation; its runtime still accepts ActionResult.
+    try:
+        case_type_response = httpx.get(
+            f"{BASE_URL}/create/caseTypes",
+            auth=basic_auth(asset.username, asset.password),
+            timeout=DEFAULT_TIMEOUT,
+            follow_redirects=True,
         )
-        case_type_list = (
-            case_type_response.get("caseType")
-            if isinstance(case_type_response, dict)
-            else None
-        )
-        if not isinstance(case_type_list, list):
-            raise PhishLabsAPIError("PhishLabs returned invalid case type data")
-    except PhishLabsError as error:
-        result = ActionResult(False, str(error), params.model_dump())
+        case_type_response.raise_for_status()
+        case_type_data = response_json(case_type_response)
+    except httpx.HTTPStatusError as error:
+        case_type_response = error.response
+        if not 200 <= case_type_response.status_code < 399:
+            result = ActionResult(False, http_status_message(case_type_response))
+            result.add_data({"brands": brand_values})
+            return cast(GetConfigOutput, result)
+    except httpx.RequestError:
+        result = ActionResult(False, "Unable to connect to PhishLabs")
         result.add_data({"brands": brand_values})
-        return result
+        return cast(GetConfigOutput, result)
+    except PhishLabsAPIError as error:
+        result = ActionResult(False, str(error))
+        result.add_data({"brands": brand_values})
+        return cast(GetConfigOutput, result)
+
+    case_type_list = (
+        case_type_data.get("caseType") if isinstance(case_type_data, dict) else None
+    )
+    if not isinstance(case_type_list, list):
+        result = ActionResult(False, "PhishLabs returned invalid case type data")
+        result.add_data({"brands": brand_values})
+        return cast(GetConfigOutput, result)
 
     case_type_values = [{"name": str(case_type)} for case_type in case_type_list]
 
-    return (
-        GetConfigOutput(brands=brand_values, case_types=case_type_values),
-        {"num_brands": len(brand_values), "num_case_types": len(case_type_values)},
+    summary = GetConfigSummary(
+        num_brands=len(brand_values), num_case_types=len(case_type_values)
     )
-
-
-def config_message(summary: dict[str, int]) -> str:
-    """Format the legacy get-config summary message."""
-    return "Num case types: {num_case_types}, Num brands: {num_brands}".format(
-        **summary
-    )
-
-
-def get_config(params: Params, soar: SOARClient, asset: Asset) -> GetConfigOutput:
-    """Return the vendor's configured brands and case types."""
-    try:
-        result = fetch_config(PhishLabsClient(asset.username, asset.password), params)
-    except PhishLabsError as error:
-        raise ActionFailure(str(error)) from error
-
-    if isinstance(result, ActionResult):
-        return cast(GetConfigOutput, result)
-
-    output, summary = result
     soar.set_summary(summary)
-    soar.set_message(config_message(summary))
-    return output
+    soar.set_message(
+        f"Num case types: {summary.num_case_types}, Num brands: {summary.num_brands}"
+    )
+    return GetConfigOutput(brands=brand_values, case_types=case_type_values)

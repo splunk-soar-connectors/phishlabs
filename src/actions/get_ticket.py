@@ -11,21 +11,23 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Any
 from urllib.parse import quote
 
+import httpx
 from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import ActionOutput, OutputField
 from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Param, Params
 
-from ..client import (
+from ..asset import Asset
+from ..auth import basic_auth
+from .utils import (
+    BASE_URL,
+    DEFAULT_TIMEOUT,
     PhishLabsAPIError,
-    PhishLabsClient,
-    PhishLabsError,
-    process_response,
+    http_status_message,
+    response_json,
 )
-from ..app import Asset
 
 
 class GetTicketParams(Params):
@@ -109,49 +111,53 @@ class GetTicketSummary(ActionOutput):
     total_result: float | None = OutputField(example_values=[1])
 
 
-def fetch_case(
-    case_id: str, client: PhishLabsClient
-) -> tuple[dict[str, Any], dict[str, Any]]:
-    """Fetch and normalize one case while keeping HTTP details in the client."""
-    endpoint = f"/data/cases/{quote(str(case_id), safe='')}"
-    response = process_response(client.request("get", endpoint))
-    case_data = response.get("data") if isinstance(response, dict) else None
+def get_ticket(
+    params: GetTicketParams, soar: SOARClient, asset: Asset
+) -> GetTicketOutput:
+    """Return one case and its legacy summary fields."""
+    case_id = params.case_id
+    endpoint = quote(str(case_id), safe="")
+    try:
+        response = httpx.get(
+            f"{BASE_URL}/data/cases/{endpoint}",
+            auth=basic_auth(asset.username, asset.password),
+            timeout=DEFAULT_TIMEOUT,
+            follow_redirects=True,
+        )
+        response.raise_for_status()
+    except httpx.HTTPStatusError as error:
+        response = error.response
+        if not 200 <= response.status_code < 399:
+            raise ActionFailure(http_status_message(response)) from error
+    except httpx.RequestError as error:
+        raise ActionFailure("Unable to connect to PhishLabs") from error
+
+    try:
+        response_data = response_json(response)
+    except PhishLabsAPIError as error:
+        raise ActionFailure(str(error)) from error
+
+    case_data = response_data.get("data") if isinstance(response_data, dict) else None
     if (
         not isinstance(case_data, list)
         or not case_data
         or not all(isinstance(case, dict) for case in case_data)
     ):
-        raise PhishLabsAPIError(f"No case found for id {case_id}")
+        raise ActionFailure(f"No case found for id {case_id}")
 
     normalized_case = dict(case_data[0])
     if str(normalized_case.get("dateClosed")) == "0001-01-01T00:00:00Z":
         normalized_case["dateClosed"] = None
 
-    header = response.get("header")
+    header = response_data.get("header")
     header = header if isinstance(header, dict) else {}
-    summary = {
-        "case_id": case_id,
-        "return_result": header.get("returnResult"),
-        "total_result": header.get("totalResult"),
-    }
-    return normalized_case, summary
-
-
-def get_ticket(
-    params: GetTicketParams, soar: SOARClient, asset: Asset
-) -> GetTicketOutput:
-    """Return one case and its legacy summary fields."""
-    try:
-        case, summary = fetch_case(
-            params.case_id, PhishLabsClient(asset.username, asset.password)
-        )
-    except PhishLabsError as error:
-        raise ActionFailure(str(error)) from error
-
+    summary = GetTicketSummary(
+        case_id=case_id,
+        return_result=header.get("returnResult"),
+        total_result=header.get("totalResult"),
+    )
     soar.set_summary(summary)
     soar.set_message(
-        "Case id: {case_id}, Return result: {return_result}, Total result: {total_result}".format(
-            **summary
-        )
+        f"Case id: {summary.case_id}, Return result: {summary.return_result}, Total result: {summary.total_result}"
     )
-    return GetTicketOutput(**case)
+    return GetTicketOutput(**normalized_case)

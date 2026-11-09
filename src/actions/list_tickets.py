@@ -13,17 +13,20 @@
 # limitations under the License.
 from typing import Any
 
+import httpx
 from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import ActionOutput, OutputField
 from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Params
 
-from ..app import Asset
-from ..client import (
+from ..asset import Asset
+from ..auth import basic_auth
+from .utils import (
+    BASE_URL,
+    DEFAULT_TIMEOUT,
     PhishLabsAPIError,
-    PhishLabsClient,
-    PhishLabsError,
-    process_response,
+    http_status_message,
+    response_json,
 )
 
 MAX_PAGE_COUNT = 500
@@ -127,21 +130,42 @@ class ListTicketsSummary(ActionOutput):
     total_cases: float = OutputField(example_values=[42])
 
 
-def fetch_cases(
-    client: PhishLabsClient, *, max_page_count: int = MAX_PAGE_COUNT
-) -> tuple[list[dict[str, Any]], int]:
-    """Fetch and normalize all case pages, honoring the legacy safety bound."""
+def list_tickets(
+    params: Params, soar: SOARClient, asset: Asset
+) -> list[ListTicketsOutput]:
+    """List PhishLabs cases across all pages."""
+    del params
     cases: list[dict[str, Any]] = []
     offset = 0
 
-    for _ in range(max_page_count):
+    for _ in range(MAX_PAGE_COUNT):
         query = {"offset": offset} if offset else None
-        response = process_response(client.request("get", "/data/cases", params=query))
-        page = response.get("data") if isinstance(response, dict) else None
+        try:
+            response = httpx.get(
+                f"{BASE_URL}/data/cases",
+                auth=basic_auth(asset.username, asset.password),
+                params=query,
+                timeout=DEFAULT_TIMEOUT,
+                follow_redirects=True,
+            )
+            response.raise_for_status()
+        except httpx.HTTPStatusError as error:
+            response = error.response
+            if not 200 <= response.status_code < 399:
+                raise ActionFailure(http_status_message(response)) from error
+        except httpx.RequestError as error:
+            raise ActionFailure("Unable to connect to PhishLabs") from error
+
+        try:
+            response_data = response_json(response)
+        except PhishLabsAPIError as error:
+            raise ActionFailure(str(error)) from error
+
+        page = response_data.get("data") if isinstance(response_data, dict) else None
         if not isinstance(page, list) or not all(
             isinstance(item, dict) for item in page
         ):
-            raise PhishLabsAPIError("PhishLabs returned invalid case data")
+            raise ActionFailure("PhishLabs returned invalid case data")
 
         for item in page:
             normalized = dict(item)
@@ -150,30 +174,16 @@ def fetch_cases(
             cases.append(normalized)
 
         offset += len(page)
-        header = response.get("header")
+        header = response_data.get("header")
         total_cases = header.get("totalResult") if isinstance(header, dict) else None
         if not isinstance(total_cases, int) or total_cases < 0:
-            raise PhishLabsAPIError("PhishLabs returned an invalid total case count")
+            raise ActionFailure("PhishLabs returned an invalid total case count")
         if offset >= total_cases:
-            return cases, total_cases
+            summary = ListTicketsSummary(total_cases=total_cases)
+            soar.set_summary(summary)
+            soar.set_message(f"Total cases: {total_cases}")
+            return [ListTicketsOutput(**case) for case in cases]
         if not page:
-            raise PhishLabsAPIError("PhishLabs returned an incomplete case listing")
+            raise ActionFailure("PhishLabs returned an incomplete case listing")
 
-    raise PhishLabsAPIError("PhishLabs case pagination exceeded the safety limit")
-
-
-def list_tickets(
-    params: Params, soar: SOARClient, asset: Asset
-) -> list[ListTicketsOutput]:
-    """List PhishLabs cases across all pages."""
-    del params
-    try:
-        cases, total_cases = fetch_cases(
-            PhishLabsClient(asset.username, asset.password)
-        )
-    except PhishLabsError as error:
-        raise ActionFailure(str(error)) from error
-
-    soar.set_summary({"total_cases": total_cases})
-    soar.set_message(f"Total cases: {total_cases}")
-    return [ListTicketsOutput(**case) for case in cases]
+    raise ActionFailure("PhishLabs case pagination exceeded the safety limit")

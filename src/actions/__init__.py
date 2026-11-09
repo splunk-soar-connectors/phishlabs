@@ -23,11 +23,13 @@ from .create_ticket import (
 from .get_config import GetConfigOutput, GetConfigSummary, get_config
 from .get_ticket import GetTicketOutput, GetTicketParams, GetTicketSummary, get_ticket
 from .list_tickets import ListTicketsOutput, ListTicketsSummary, list_tickets
+from .make_request import make_request
 from ..views.get_config import display_config
 
 
 def register_actions(app: App) -> App:
     """Register ordinary PhishLabs actions."""
+    app.make_request()(make_request)
     app.register_action(
         action=create_ticket,
         description="Create a new case submission",

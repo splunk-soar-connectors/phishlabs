@@ -11,19 +11,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Any
-
+import httpx
 from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import ActionOutput, OutputField
 from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Param, Params
 
-from ..app import Asset
-from ..client import (
+from ..asset import Asset
+from ..auth import basic_auth
+from ..validators import validate_case_url
+from .utils import (
+    BASE_URL,
+    DEFAULT_TIMEOUT,
     PhishLabsAPIError,
-    PhishLabsClient,
-    PhishLabsError,
-    process_response,
+    http_status_message,
+    response_json,
 )
 
 
@@ -61,80 +63,59 @@ class CreateTicketSummary(ActionOutput):
     status: str = OutputField(example_values=["New"])
 
 
-def build_new_case_payload(
-    *,
-    title: str,
-    case_type: str,
-    brand: str,
-    url: str | None,
-    description: str | None,
-) -> dict[str, dict[str, str]]:
-    """Validate legacy URL requirements and build the vendor request body."""
-    normalized_url = url or ""
-    if case_type in ("Phishing", "Phishing Redirect") and normalized_url == "":
-        raise ValueError(f"Case type '{case_type}' requires a URL")
-
-    return {
-        "newCase": {
-            "title": title,
-            "caseType": case_type,
-            "brand": brand,
-            "url": normalized_url,
-            "description": description or "",
-        }
-    }
-
-
-def create_case(
-    client: PhishLabsClient,
-    *,
-    title: str,
-    case_type: str,
-    brand: str,
-    url: str | None,
-    description: str | None,
-) -> tuple[dict[str, Any], dict[str, Any]]:
-    """Create a case and return the confirmed response and legacy summary."""
-    payload = build_new_case_payload(
-        title=title,
-        case_type=case_type,
-        brand=brand,
-        url=url,
-        description=description,
-    )
-    response = process_response(client.request("post", "/create/newCase", data=payload))
-    created_case = response.get("createdCase") if isinstance(response, dict) else None
-    if not isinstance(created_case, dict) or not created_case.get("caseId"):
-        raise PhishLabsAPIError("PhishLabs did not confirm ticket creation")
-
-    summary = {
-        "status": created_case.get("status"),
-        "case_id": created_case.get("caseId"),
-        "case_number": created_case.get("caseNumber"),
-    }
-    return {"createdCase": created_case}, summary
-
-
 def create_ticket(
     params: CreateTicketParams, soar: SOARClient, asset: Asset
 ) -> CreateTicketOutput:
     """Create one PhishLabs case and report its confirmation."""
     try:
-        output, summary = create_case(
-            PhishLabsClient(asset.username, asset.password),
-            title=params.title,
-            case_type=params.case_type,
-            brand=params.brand,
-            url=params.url,
-            description=params.description,
+        normalized_url = validate_case_url(params.case_type, params.url)
+    except ValueError as error:
+        raise ActionFailure(str(error)) from error
+    payload = {
+        "newCase": {
+            "title": params.title,
+            "caseType": params.case_type,
+            "brand": params.brand,
+            "url": normalized_url,
+            "description": params.description or "",
+        }
+    }
+
+    try:
+        response = httpx.post(
+            f"{BASE_URL}/create/newCase",
+            auth=basic_auth(asset.username, asset.password),
+            json=payload,
+            timeout=DEFAULT_TIMEOUT,
+            follow_redirects=True,
         )
-    except (PhishLabsError, ValueError) as error:
+        response.raise_for_status()
+    except httpx.HTTPStatusError as error:
+        response = error.response
+        if not 200 <= response.status_code < 399:
+            raise ActionFailure(http_status_message(response)) from error
+    except httpx.RequestError as error:
+        raise ActionFailure("Unable to connect to PhishLabs") from error
+
+    try:
+        response_data = response_json(response)
+    except PhishLabsAPIError as error:
         raise ActionFailure(str(error)) from error
 
+    created_case = (
+        response_data.get("createdCase") if isinstance(response_data, dict) else None
+    )
+    if not isinstance(created_case, dict) or not created_case.get("caseId"):
+        raise ActionFailure("PhishLabs did not confirm ticket creation")
+
+    output = CreateTicketOutput(createdCase=created_case)
+    summary = CreateTicketSummary(
+        status=created_case.get("status"),
+        case_id=created_case.get("caseId"),
+        case_number=created_case.get("caseNumber"),
+    )
     soar.set_summary(summary)
     soar.set_message(
-        "Status: {status}, Case id: {case_id}, Case number: {case_number}".format(
-            **summary
-        )
+        f"Status: {summary.status}, Case id: {summary.case_id}, Case number: {summary.case_number}"
     )
-    return CreateTicketOutput(**output)
+    return output

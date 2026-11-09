@@ -11,11 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from .client import PhishLabsClient, process_response
+from soar_sdk.asset import AssetField, BaseAsset
 
 
-def run_test_connectivity(username: str, password: str) -> None:
-    """Verify the configured credentials by querying the cases endpoint."""
-    client = PhishLabsClient(username, password)
-    response = client.request("get", "/data/cases")
-    process_response(response)
+class Asset(BaseAsset):
+    username: str = AssetField(description="Username")
+    password: str = AssetField(description="Password", sensitive=True)

@@ -13,16 +13,12 @@
 # limitations under the License.
 from soar_sdk.abstract import SOARClient
 from soar_sdk.app import App
-from soar_sdk.asset import BaseAsset, AssetField
 from soar_sdk.exceptions import ActionFailure
 
-from .client import PhishLabsError
-from .test_connectivity import run_test_connectivity
-
-
-class Asset(BaseAsset):
-    username: str = AssetField(description="Username")
-    password: str = AssetField(description="Password", sensitive=True)
+from .actions import register_actions
+from .actions.test_connectivity import run_test_connectivity
+from .actions.utils import PhishLabsError
+from .asset import Asset
 
 
 def create_phishlabs_app() -> App:
@@ -57,10 +53,6 @@ def create_phishlabs_app() -> App:
 
 
 app = create_phishlabs_app()
-
-
-from .actions import register_actions
-
 register_actions(app)
 
 
