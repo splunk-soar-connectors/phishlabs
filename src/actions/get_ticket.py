@@ -55,30 +55,40 @@ class NotesOutput(ActionOutput):
 
 
 class GetTicketOutput(ActionOutput):
+    customer: str = OutputField(column_name="Customer", example_values=["Splunk"])
+    caseType: str = OutputField(
+        cef_types=["phishlabs case type"],
+        column_name="Case Type",
+        example_values=["Phishing"],
+    )
+    caseNumber: float = OutputField(column_name="Case Number", example_values=[714441])
+    title: str = OutputField(column_name="Case Title", example_values=["my_case_title"])
+    caseStatus: str = OutputField(column_name="Status", example_values=["New"])
+    resolutionStatus: str | None = OutputField(
+        column_name="Resolution Status",
+        example_values=["No malicious content, referred to client."],
+    )
+    description: str = OutputField(
+        column_name="Description",
+        example_values=["This is my description\n\nhttp://suspiciousurl.com/1"],
+    )
+    dateCreated: str = OutputField(
+        column_name="Date Created", example_values=["2018-02-21T22:30:13Z"]
+    )
+    dateClosed: str | None = OutputField(
+        column_name="Date Closed", example_values=["0001-01-01T00:00:00Z"]
+    )
+    dateModified: str = OutputField(
+        column_name="Date Modified", example_values=["2018-02-21T22:30:13Z"]
+    )
     brand: str = OutputField(cef_types=["phishlabs brand"], example_values=["BRAND1"])
     caseId: str = OutputField(
         cef_types=["phishlabs case id"],
         example_values=["c88dc75c-1756-11e8-8a25-0a799650b9c8"],
     )
-    caseNumber: float = OutputField(example_values=[714441])
-    caseStatus: str = OutputField(example_values=["New"])
-    caseType: str = OutputField(
-        cef_types=["phishlabs case type"], example_values=["Phishing"]
-    )
     createdBy: CreatedbyOutput
-    customer: str = OutputField(example_values=["Splunk"])
-    dateClosed: str | None = OutputField(example_values=["0001-01-01T00:00:00Z"])
-    dateCreated: str = OutputField(example_values=["2018-02-21T22:30:13Z"])
-    dateModified: str = OutputField(example_values=["2018-02-21T22:30:13Z"])
-    description: str = OutputField(
-        example_values=["This is my description\n\nhttp://suspiciousurl.com/1"]
-    )
     formReceiver: bool = OutputField(example_values=[True])
     notes: list[NotesOutput] | None = OutputField()
-    resolutionStatus: str | None = OutputField(
-        example_values=["No malicious content, referred to client."]
-    )
-    title: str = OutputField(example_values=["my_case_title"])
     appDate: str | None = OutputField(example_values=["0001-01-01T00:00:00Z"])
     sourceName: str | None = OutputField(example_values=["Client Submitted (CCAPI)"])
     brandAbuseFlag: bool | None = OutputField(example_values=[True, False])

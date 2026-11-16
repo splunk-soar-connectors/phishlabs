@@ -79,28 +79,37 @@ class CaselinksOutput(ActionOutput):
 
 
 class ListTicketsOutput(ActionOutput):
-    brand: str = OutputField(cef_types=["phishlabs brand"], example_values=["BRAND1"])
+    caseNumber: float = OutputField(column_name="Case Number", example_values=[714441])
+    caseType: str = OutputField(
+        cef_types=["phishlabs case type"],
+        column_name="Case Type",
+        example_values=["Phishing"],
+    )
+    title: str = OutputField(column_name="Title", example_values=["my_case_title"])
+    caseStatus: str = OutputField(column_name="Case Status", example_values=["New"])
     caseId: str = OutputField(
         cef_types=["phishlabs case id"],
+        column_name="Case ID",
         example_values=["c88dc75c-1756-11e8-8a25-0a799650b9c8"],
     )
-    caseNumber: float = OutputField(example_values=[714441])
-    caseStatus: str = OutputField(example_values=["New"])
-    caseType: str = OutputField(
-        cef_types=["phishlabs case type"], example_values=["Phishing"]
+    dateCreated: str = OutputField(
+        column_name="Date Created", example_values=["2018-02-21T22:30:13Z"]
     )
+    dateClosed: str | None = OutputField(
+        column_name="Date Closed", example_values=[OPEN_DATE_SENTINEL]
+    )
+    dateModified: str = OutputField(
+        column_name="Date Modified", example_values=["2018-02-21T22:30:13Z"]
+    )
+    brand: str = OutputField(cef_types=["phishlabs brand"], example_values=["BRAND1"])
     createdBy: CreatedbyOutput
     customer: str = OutputField(example_values=["Splunk"])
-    dateClosed: str | None = OutputField(example_values=[OPEN_DATE_SENTINEL])
-    dateCreated: str = OutputField(example_values=["2018-02-21T22:30:13Z"])
-    dateModified: str = OutputField(example_values=["2018-02-21T22:30:13Z"])
     description: str = OutputField(
         example_values=["This is my description\n\nhttp://suspiciousurl.com/1"]
     )
     formReceiver: bool = OutputField(example_values=[True])
     notes: list[NotesOutput] | None = OutputField()
     resolutionStatus: str | None = OutputField()
-    title: str = OutputField(example_values=["my_case_title"])
     appDate: str | None = OutputField(example_values=["0001-01-01T00:00:00Z"])
     sourceName: str | None = OutputField(example_values=["Client Submitted (CCAPI)"])
     brandAbuseFlag: bool | None = OutputField(example_values=[True, False])

@@ -30,11 +30,18 @@ from .utils import (
 
 
 class CreateTicketParams(Params):
-    title: str = Param(description="Title")
-    url: str | None = Param(description="URL", primary=True, cef_types=["url"])
-    description: str | None = Param(description="Description of the case")
+    title: str = Param(description="Title", column_name="Title")
+    url: str | None = Param(
+        description="URL", primary=True, cef_types=["url"], column_name="URL"
+    )
+    description: str | None = Param(
+        description="Description of the case", column_name="Description"
+    )
     case_type: str = Param(
-        description="Type of case", primary=True, cef_types=["phishlabs case type"]
+        description="Type of case",
+        primary=True,
+        cef_types=["phishlabs case type"],
+        column_name="Case Type",
     )
     brand: str = Param(
         description="Brand for the case", primary=True, cef_types=["phishlabs brand"]
@@ -44,9 +51,10 @@ class CreateTicketParams(Params):
 class CreatedcaseOutput(ActionOutput):
     caseId: str = OutputField(
         cef_types=["phishlabs case id"],
+        column_name="Case ID",
         example_values=["c88dc75c-1756-11e8-8a25-0a799650b9c8"],
     )
-    caseNumber: float = OutputField(example_values=[714441])
+    caseNumber: float = OutputField(column_name="Case Number", example_values=[714441])
     status: str = OutputField(example_values=["New"])
 
 

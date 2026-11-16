@@ -147,27 +147,27 @@ DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 action_result.status | string | | success failure |
 action_result.message | string | | |
 action_result.parameter.case_id | string | `phishlabs case id` | |
+action_result.data.\*.customer | string | | Splunk |
+action_result.data.\*.caseType | string | `phishlabs case type` | Phishing |
+action_result.data.\*.caseNumber | numeric | | 714441 |
+action_result.data.\*.title | string | | my_case_title |
+action_result.data.\*.caseStatus | string | | New |
+action_result.data.\*.resolutionStatus | string | | No malicious content, referred to client. |
+action_result.data.\*.description | string | | This is my description http://suspiciousurl.com/1 |
+action_result.data.\*.dateCreated | string | | 2018-02-21T22:30:13Z |
+action_result.data.\*.dateClosed | string | | 0001-01-01T00:00:00Z |
+action_result.data.\*.dateModified | string | | 2018-02-21T22:30:13Z |
 action_result.data.\*.brand | string | `phishlabs brand` | BRAND1 |
 action_result.data.\*.caseId | string | `phishlabs case id` | c88dc75c-1756-11e8-8a25-0a799650b9c8 |
-action_result.data.\*.caseNumber | numeric | | 714441 |
-action_result.data.\*.caseStatus | string | | New |
-action_result.data.\*.caseType | string | `phishlabs case type` | Phishing |
 action_result.data.\*.createdBy.id | string | | b2aff1a8-0d16-11e8-9e8e-0ee0a3f3cb1c |
 action_result.data.\*.createdBy.name | string | | user |
 action_result.data.\*.createdBy.displayName | string | | Test User |
 action_result.data.\*.createdBy.organization | string | | Splunk |
-action_result.data.\*.customer | string | | Splunk |
-action_result.data.\*.dateClosed | string | | 0001-01-01T00:00:00Z |
-action_result.data.\*.dateCreated | string | | 2018-02-21T22:30:13Z |
-action_result.data.\*.dateModified | string | | 2018-02-21T22:30:13Z |
-action_result.data.\*.description | string | | This is my description http://suspiciousurl.com/1 |
 action_result.data.\*.formReceiver | boolean | | True False |
 action_result.data.\*.notes.\*.author | string | | soap.api |
 action_result.data.\*.notes.\*.dateCreated | string | | 2018-03-12T08:48:05Z |
 action_result.data.\*.notes.\*.dateModified | string | | 2018-03-12T08:48:05Z |
 action_result.data.\*.notes.\*.note | string | | Case rejected.The client-submitted URL (https://www.suspiciousurl.com) is non-malicious. |
-action_result.data.\*.resolutionStatus | string | | No malicious content, referred to client. |
-action_result.data.\*.title | string | | my_case_title |
 action_result.data.\*.appDate | string | | 0001-01-01T00:00:00Z |
 action_result.data.\*.sourceName | string | | Client Submitted (CCAPI) |
 action_result.data.\*.brandAbuseFlag | boolean | | True False |
@@ -198,19 +198,20 @@ DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
 action_result.status | string | | success failure |
 action_result.message | string | | |
-action_result.data.\*.brand | string | `phishlabs brand` | BRAND1 |
-action_result.data.\*.caseId | string | `phishlabs case id` | c88dc75c-1756-11e8-8a25-0a799650b9c8 |
 action_result.data.\*.caseNumber | numeric | | 714441 |
-action_result.data.\*.caseStatus | string | | New |
 action_result.data.\*.caseType | string | `phishlabs case type` | Phishing |
+action_result.data.\*.title | string | | my_case_title |
+action_result.data.\*.caseStatus | string | | New |
+action_result.data.\*.caseId | string | `phishlabs case id` | c88dc75c-1756-11e8-8a25-0a799650b9c8 |
+action_result.data.\*.dateCreated | string | | 2018-02-21T22:30:13Z |
+action_result.data.\*.dateClosed | string | | 0001-01-01T00:00:00Z |
+action_result.data.\*.dateModified | string | | 2018-02-21T22:30:13Z |
+action_result.data.\*.brand | string | `phishlabs brand` | BRAND1 |
 action_result.data.\*.createdBy.id | string | | b2aff1a8-0d16-11e8-9e8e-0ee0a3f3cb1c |
 action_result.data.\*.createdBy.name | string | | user |
 action_result.data.\*.createdBy.displayName | string | | Test User |
 action_result.data.\*.createdBy.organization | string | | Splunk |
 action_result.data.\*.customer | string | | Splunk |
-action_result.data.\*.dateClosed | string | | 0001-01-01T00:00:00Z |
-action_result.data.\*.dateCreated | string | | 2018-02-21T22:30:13Z |
-action_result.data.\*.dateModified | string | | 2018-02-21T22:30:13Z |
 action_result.data.\*.description | string | | This is my description http://suspiciousurl.com/1 |
 action_result.data.\*.formReceiver | boolean | | True False |
 action_result.data.\*.notes.\*.author | string | | soc |
@@ -218,7 +219,6 @@ action_result.data.\*.notes.\*.dateCreated | string | | 2018-02-21T03:24:14Z |
 action_result.data.\*.notes.\*.dateModified | string | | 2018-02-21T03:24:14Z |
 action_result.data.\*.notes.\*.note | string | | Whois info for www.invalidurl.com: Record last updated: 2018-02-20 Whois record: Domain Name: InvalidUrl.com Registry Domain ID: 1614701904_DOMAIN_COM-VRSN Registrar WHOIS server: whois.NameBright.com Registrar URL: http://www.NameBright.com Updated Date: 2017-09-08T00:00:00.000Z Creation Date: 2010-09-07T18:49:01.000Z Registrar Registration Expiration Date: 2018-09-07T00:00:00.000Z Registrar: TurnCommerce, Inc. DBA NameBright.com... |
 action_result.data.\*.resolutionStatus | string | | |
-action_result.data.\*.title | string | | my_case_title |
 action_result.data.\*.appDate | string | | 0001-01-01T00:00:00Z |
 action_result.data.\*.sourceName | string | | Client Submitted (CCAPI) |
 action_result.data.\*.brandAbuseFlag | boolean | | True False |
