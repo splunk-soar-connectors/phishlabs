@@ -52,11 +52,6 @@ def make_request(params: MakeRequestParams, asset: Asset) -> MakeRequestOutput:
             verify=params.verify_ssl,
             follow_redirects=True,
         )
-        try:
-            response.raise_for_status()
-        except httpx.HTTPStatusError as error:
-            # Make Request returns status and body so callers can inspect API errors.
-            response = error.response
     except httpx.RequestError as error:
         raise ActionFailure("Unable to connect to PhishLabs") from error
 

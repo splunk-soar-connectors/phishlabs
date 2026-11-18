@@ -48,8 +48,6 @@ def create_phishlabs_app() -> App:
             run_test_connectivity(asset.username, asset.password)
         except PhishLabsError as error:
             raise ActionFailure(str(error)) from error
-        except Exception as error:
-            raise ActionFailure("PhishLabs connectivity test failed") from error
 
     return app
 

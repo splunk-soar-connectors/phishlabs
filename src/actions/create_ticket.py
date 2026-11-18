@@ -129,13 +129,16 @@ def create_ticket(
         response_data.get("updatedCase") if isinstance(response_data, dict) else None
     )
     output = CreateTicketOutput(createdCase=created_case, updatedCase=updated_case)
+    status = created_case.get("status")
+    case_id = created_case.get("caseId")
+    case_number = created_case.get("caseNumber")
     summary = CreateTicketSummary(
-        status=created_case.get("status"),
-        case_id=created_case.get("caseId"),
-        case_number=created_case.get("caseNumber"),
+        status=status,
+        case_id=case_id,
+        case_number=case_number,
     )
     soar.set_summary(summary)
     soar.set_message(
-        f"Status: {summary.status}, Case id: {summary.case_id}, Case number: {summary.case_number}"
+        f"Status: {status}, Case id: {case_id}, Case number: {case_number}"
     )
     return output

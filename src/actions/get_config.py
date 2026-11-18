@@ -91,7 +91,6 @@ def get_config(params: Params, soar: SOARClient, asset: Asset) -> GetConfigOutpu
             follow_redirects=True,
         )
         case_type_response.raise_for_status()
-        case_type_data = response_json(case_type_response)
     except httpx.HTTPStatusError as error:
         case_type_response = error.response
         if not 200 <= case_type_response.status_code < 399:
@@ -102,6 +101,9 @@ def get_config(params: Params, soar: SOARClient, asset: Asset) -> GetConfigOutpu
         result = ActionResult(False, "Unable to connect to PhishLabs")
         result.add_data({"brands": brand_values})
         return cast(GetConfigOutput, result)
+
+    try:
+        case_type_data = response_json(case_type_response)
     except PhishLabsAPIError as error:
         result = ActionResult(False, str(error))
         result.add_data({"brands": brand_values})
@@ -122,6 +124,6 @@ def get_config(params: Params, soar: SOARClient, asset: Asset) -> GetConfigOutpu
     )
     soar.set_summary(summary)
     soar.set_message(
-        f"Num case types: {summary.num_case_types}, Num brands: {summary.num_brands}"
+        f"Num brands: {summary.num_brands}, Num case types: {summary.num_case_types}"
     )
     return GetConfigOutput(brands=brand_values, case_types=case_type_values)

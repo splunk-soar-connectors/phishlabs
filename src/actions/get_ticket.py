@@ -147,13 +147,15 @@ def get_ticket(
 
     header = response_data.get("header")
     header = header if isinstance(header, dict) else {}
+    return_result = header.get("returnResult")
+    total_result = header.get("totalResult")
     summary = GetTicketSummary(
         case_id=case_id,
-        return_result=header.get("returnResult"),
-        total_result=header.get("totalResult"),
+        return_result=return_result,
+        total_result=total_result,
     )
     soar.set_summary(summary)
     soar.set_message(
-        f"Case id: {summary.case_id}, Return result: {summary.return_result}, Total result: {summary.total_result}"
+        f"Case id: {summary.case_id}, Return result: {return_result}, Total result: {total_result}"
     )
     return GetTicketOutput(**normalized_case)

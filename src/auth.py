@@ -11,9 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import httpx
+from soar_sdk.auth import BasicAuth
 
 
-def basic_auth(username: str, password: str) -> httpx.BasicAuth:
+def basic_auth(username: str, password: str) -> BasicAuth:
     """Create PhishLabs HTTP Basic authentication from extracted credentials."""
-    return httpx.BasicAuth(username, password)
+    return BasicAuth(username, password)
