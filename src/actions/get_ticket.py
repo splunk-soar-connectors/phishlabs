@@ -15,7 +15,7 @@ from urllib.parse import quote
 
 import httpx
 from soar_sdk.abstract import SOARClient
-from soar_sdk.action_results import ActionOutput, OutputField
+from soar_sdk.action_results import ActionOutput, OutputField, PermissiveActionOutput
 from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Param, Params
 
@@ -37,10 +37,12 @@ class GetTicketParams(Params):
 
 
 class CreatedbyOutput(ActionOutput):
-    id: str = OutputField(example_values=["b2aff1a8-0d16-11e8-9e8e-0ee0a3f3cb1c"])
-    name: str = OutputField(example_values=["user"])
-    displayName: str = OutputField(example_values=["Test User"])
-    organization: str = OutputField(example_values=["Splunk"])
+    id: str | None = OutputField(
+        example_values=["b2aff1a8-0d16-11e8-9e8e-0ee0a3f3cb1c"]
+    )
+    name: str | None = OutputField(example_values=["user"])
+    displayName: str | None = OutputField(example_values=["Test User"])
+    organization: str | None = OutputField(example_values=["Splunk"])
 
 
 class NotesOutput(ActionOutput):
@@ -54,14 +56,16 @@ class NotesOutput(ActionOutput):
     )
 
 
-class GetTicketOutput(ActionOutput):
+class GetTicketOutput(PermissiveActionOutput):
+    """Keep vendor case fields that are not declared in the current schema."""
+
     customer: str = OutputField(column_name="Customer", example_values=["Splunk"])
     caseType: str = OutputField(
         cef_types=["phishlabs case type"],
         column_name="Case Type",
         example_values=["Phishing"],
     )
-    caseNumber: float = OutputField(column_name="Case Number", example_values=[714441])
+    caseNumber: int = OutputField(column_name="Case Number", example_values=[714441])
     title: str = OutputField(column_name="Case Title", example_values=["my_case_title"])
     caseStatus: str = OutputField(column_name="Status", example_values=["New"])
     resolutionStatus: str | None = OutputField(
@@ -86,7 +90,7 @@ class GetTicketOutput(ActionOutput):
         cef_types=["phishlabs case id"],
         example_values=["c88dc75c-1756-11e8-8a25-0a799650b9c8"],
     )
-    createdBy: CreatedbyOutput
+    createdBy: CreatedbyOutput | None = OutputField()
     formReceiver: bool = OutputField(example_values=[True])
     notes: list[NotesOutput] | None = OutputField()
     appDate: str | None = OutputField(example_values=["0001-01-01T00:00:00Z"])

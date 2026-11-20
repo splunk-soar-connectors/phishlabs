@@ -124,6 +124,6 @@ def get_config(params: Params, soar: SOARClient, asset: Asset) -> GetConfigOutpu
     )
     soar.set_summary(summary)
     soar.set_message(
-        f"Num brands: {summary.num_brands}, Num case types: {summary.num_case_types}"
+        f"Num case types: {summary.num_case_types}, Num brands: {summary.num_brands}"
     )
     return GetConfigOutput(brands=brand_values, case_types=case_type_values)

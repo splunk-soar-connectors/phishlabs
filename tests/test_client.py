@@ -284,12 +284,12 @@ def test_create_ticket_sends_legacy_body_and_summary(
         {
             "createdCase": {
                 "caseId": "case-123",
-                "caseNumber": 714441,
+                "caseNumber": 714441.0,
                 "status": "New",
             },
             "updatedCase": {
                 "caseId": "updated-case-456",
-                "caseNumber": 714442,
+                "caseNumber": 714442.0,
                 "status": "Updated",
             },
         }
@@ -322,16 +322,19 @@ def test_create_ticket_sends_legacy_body_and_summary(
     assert result.model_dump(by_alias=True) == {
         "createdCase": {
             "caseId": "case-123",
-            "caseNumber": 714441.0,
+            "caseNumber": 714441,
             "status": "New",
         },
         "updatedCase": {
             "caseId": "updated-case-456",
-            "caseNumber": 714442.0,
+            "caseNumber": 714442,
             "status": "Updated",
         },
     }
     assert app_module.app.soar_client.get_summary().case_id == "case-123"
+    assert app_module.app.soar_client.get_message() == (
+        "Status: New, Case id: case-123, Case number: 714441"
+    )
 
 
 @pytest.mark.parametrize("case_type", ["Phishing", "Phishing Redirect"])

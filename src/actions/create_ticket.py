@@ -54,15 +54,17 @@ class CreatedcaseOutput(ActionOutput):
         column_name="Case ID",
         example_values=["c88dc75c-1756-11e8-8a25-0a799650b9c8"],
     )
-    caseNumber: float = OutputField(column_name="Case Number", example_values=[714441])
-    status: str = OutputField(example_values=["New"])
+    caseNumber: int | None = OutputField(
+        column_name="Case Number", example_values=[714441]
+    )
+    status: str | None = OutputField(example_values=["New"])
 
 
 class UpdatedcaseOutput(ActionOutput):
     caseId: str | None = OutputField(
         example_values=["c88dc75c-1756-11e8-8a25-0a799650b9c8"]
     )
-    caseNumber: float | None = OutputField(example_values=[714441])
+    caseNumber: int | None = OutputField(example_values=[714441])
     status: str | None = OutputField(example_values=["New"])
 
 
@@ -76,8 +78,8 @@ class CreateTicketSummary(ActionOutput):
         cef_types=["phishlabs case id"],
         example_values=["c88dc75c-1756-11e8-8a25-0a799650b9c8"],
     )
-    case_number: float = OutputField(example_values=[714441])
-    status: str = OutputField(example_values=["New"])
+    case_number: int | None = OutputField(example_values=[714441])
+    status: str | None = OutputField(example_values=["New"])
 
 
 def create_ticket(
@@ -139,6 +141,6 @@ def create_ticket(
     )
     soar.set_summary(summary)
     soar.set_message(
-        f"Status: {status}, Case id: {case_id}, Case number: {case_number}"
+        f"Status: {status}, Case id: {case_id}, Case number: {summary.case_number}"
     )
     return output

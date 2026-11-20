@@ -11,11 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Any
+from typing import Any, cast
 
 import httpx
 from soar_sdk.abstract import SOARClient
-from soar_sdk.action_results import ActionOutput, OutputField
+from soar_sdk.action_results import ActionOutput, ActionResult, OutputField
 from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Params
 
@@ -34,10 +34,12 @@ OPEN_DATE_SENTINEL = "0001-01-01T00:00:00Z"
 
 
 class CreatedbyOutput(ActionOutput):
-    id: str = OutputField(example_values=["b2aff1a8-0d16-11e8-9e8e-0ee0a3f3cb1c"])
-    name: str = OutputField(example_values=["user"])
-    displayName: str = OutputField(example_values=["Test User"])
-    organization: str = OutputField(example_values=["Splunk"])
+    id: str | None = OutputField(
+        example_values=["b2aff1a8-0d16-11e8-9e8e-0ee0a3f3cb1c"]
+    )
+    name: str | None = OutputField(example_values=["user"])
+    displayName: str | None = OutputField(example_values=["Test User"])
+    organization: str | None = OutputField(example_values=["Splunk"])
 
 
 class NotesOutput(ActionOutput):
@@ -73,13 +75,13 @@ class CaselinksOutput(ActionOutput):
     caseId: str = OutputField(example_values=["5a0321e3-273d-11ec-b912-0a8e0de89b4e"])
     caseType: str = OutputField(example_values=["Phishing"])
     linkType: str = OutputField(example_values=["Clone"])
-    caseNumber: float = OutputField(example_values=[2639769])
+    caseNumber: int = OutputField(example_values=[2639769])
     caseStatus: str = OutputField(example_values=["Rejected"])
     linkCreated: str = OutputField(example_values=["2021-10-11T13:48:55.568376569Z"])
 
 
 class ListTicketsOutput(ActionOutput):
-    caseNumber: float = OutputField(column_name="Case Number", example_values=[714441])
+    caseNumber: int = OutputField(column_name="Case Number", example_values=[714441])
     caseType: str = OutputField(
         cef_types=["phishlabs case type"],
         column_name="Case Type",
@@ -102,7 +104,7 @@ class ListTicketsOutput(ActionOutput):
         column_name="Date Modified", example_values=["2018-02-21T22:30:13Z"]
     )
     brand: str = OutputField(cef_types=["phishlabs brand"], example_values=["BRAND1"])
-    createdBy: CreatedbyOutput
+    createdBy: CreatedbyOutput | None = OutputField()
     customer: str = OutputField(example_values=["Splunk"])
     description: str = OutputField(
         example_values=["This is my description\n\nhttp://suspiciousurl.com/1"]
@@ -133,52 +135,65 @@ def list_tickets(
     cases: list[dict[str, Any]] = []
     offset = 0
 
-    for _ in range(MAX_PAGE_COUNT):
-        query = {"offset": offset} if offset else None
-        try:
-            response = httpx.get(
-                f"{BASE_URL}/data/cases",
-                auth=basic_auth(asset.username, asset.password),
-                params=query,
-                timeout=DEFAULT_TIMEOUT,
-                follow_redirects=True,
+    try:
+        for _ in range(MAX_PAGE_COUNT):
+            query = {"offset": offset} if offset else None
+            try:
+                response = httpx.get(
+                    f"{BASE_URL}/data/cases",
+                    auth=basic_auth(asset.username, asset.password),
+                    params=query,
+                    timeout=DEFAULT_TIMEOUT,
+                    follow_redirects=True,
+                )
+                response.raise_for_status()
+            except httpx.HTTPStatusError as error:
+                response = error.response
+                if not 200 <= response.status_code < 399:
+                    raise ActionFailure(http_status_message(response)) from error
+            except httpx.RequestError as error:
+                raise ActionFailure("Unable to connect to PhishLabs") from error
+
+            try:
+                response_data = response_json(response)
+            except PhishLabsAPIError as error:
+                raise ActionFailure(str(error)) from error
+
+            page = (
+                response_data.get("data") if isinstance(response_data, dict) else None
             )
-            response.raise_for_status()
-        except httpx.HTTPStatusError as error:
-            response = error.response
-            if not 200 <= response.status_code < 399:
-                raise ActionFailure(http_status_message(response)) from error
-        except httpx.RequestError as error:
-            raise ActionFailure("Unable to connect to PhishLabs") from error
+            if not isinstance(page, list) or not all(
+                isinstance(item, dict) for item in page
+            ):
+                raise ActionFailure("PhishLabs returned invalid case data")
 
-        try:
-            response_data = response_json(response)
-        except PhishLabsAPIError as error:
-            raise ActionFailure(str(error)) from error
+            for item in page:
+                normalized = dict(item)
+                if str(normalized.get("dateClosed")) == OPEN_DATE_SENTINEL:
+                    normalized["dateClosed"] = None
+                cases.append(normalized)
 
-        page = response_data.get("data") if isinstance(response_data, dict) else None
-        if not isinstance(page, list) or not all(
-            isinstance(item, dict) for item in page
-        ):
-            raise ActionFailure("PhishLabs returned invalid case data")
+            offset += len(page)
+            header = response_data.get("header")
+            total_cases = (
+                header.get("totalResult") if isinstance(header, dict) else None
+            )
+            if not isinstance(total_cases, int) or total_cases < 0:
+                raise ActionFailure("PhishLabs returned an invalid total case count")
+            if offset >= total_cases:
+                summary = ListTicketsSummary(total_cases=total_cases)
+                soar.set_summary(summary)
+                soar.set_message(f"Total cases: {total_cases}")
+                return [ListTicketsOutput(**case) for case in cases]
+            if not page:
+                raise ActionFailure("PhishLabs returned an incomplete case listing")
+        raise ActionFailure("PhishLabs case pagination exceeded the safety limit")
+    except ActionFailure as error:
+        if not cases:
+            raise
 
-        for item in page:
-            normalized = dict(item)
-            if str(normalized.get("dateClosed")) == OPEN_DATE_SENTINEL:
-                normalized["dateClosed"] = None
-            cases.append(normalized)
-
-        offset += len(page)
-        header = response_data.get("header")
-        total_cases = header.get("totalResult") if isinstance(header, dict) else None
-        if not isinstance(total_cases, int) or total_cases < 0:
-            raise ActionFailure("PhishLabs returned an invalid total case count")
-        if offset >= total_cases:
-            summary = ListTicketsSummary(total_cases=total_cases)
-            soar.set_summary(summary)
-            soar.set_message(f"Total cases: {total_cases}")
-            return [ListTicketsOutput(**case) for case in cases]
-        if not page:
-            raise ActionFailure("PhishLabs returned an incomplete case listing")
-
-    raise ActionFailure("PhishLabs case pagination exceeded the safety limit")
+        # Return fetched cases with a failed status, matching legacy pagination behavior.
+        result = ActionResult(False, str(error))
+        for case in cases:
+            result.add_data(case)
+        return cast(list[ListTicketsOutput], result)
