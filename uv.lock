@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = "==3.13.*"
 resolution-markers = [
     "platform_machine == 'x86_64' and sys_platform == 'linux'",
@@ -605,7 +605,7 @@ wheels = [
 
 [[package]]
 name = "phishlabs"
-version = "2.0.9"
+version = "3.0.0"
 source = { virtual = "." }
 dependencies = [
     { name = "httpx" },
