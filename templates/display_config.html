@@ -1,0 +1,86 @@
+<!--
+Copyright (c) 2026 Splunk Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<style>
+  .phishlabs-app a:hover { text-decoration: underline; }
+  .phishlabs-app .wf-h3-style { font-size: 20px; }
+  .phishlabs-app .wf-table-horizontal {
+    margin-right: 10px;
+    width: initial;
+    border: 1px solid;
+    font-size: 12px;
+  }
+  .phishlabs-app .wf-table-horizontal th {
+    text-align: center;
+    border: 1px solid;
+    text-transform: uppercase;
+    font-weight: normal;
+    padding: 5px;
+  }
+  .phishlabs-app .wf-table-horizontal td {
+    border: 1px solid;
+    padding: 5px 5px 5px 4px;
+  }
+</style>
+<div class="phishlabs-app"
+     style="overflow: auto;
+            width: 100%;
+            height: 100%;
+            padding-left: 10px;
+            padding-right: 10px">
+  {% for result in results %}
+    <br>
+    <h3 class="wf-h3-style">Info</h3>
+    {% if result.brands %}
+      <table class="wf-table-horizontal">
+        <tr>
+          <th>BRAND</th>
+        </tr>
+        {% for brand in result.brands %}
+          <tr>
+            <td>
+              <a href="javascript:;"
+                 onclick='context_menu(this, {{ [{"contains": ["phishlabs brand"], "value": brand.name}]|tojson }}, 0, {{ container }}, null, false);'>
+                {{ brand.name }}&nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+              </a>
+            </td>
+          </tr>
+        {% endfor %}
+      </table>
+    {% else %}
+      <p>No Brands in results</p>
+    {% endif %}
+    <br>
+    {% if result.case_types %}
+      <table class="wf-table-horizontal">
+        <tr>
+          <th>CASE TYPE</th>
+        </tr>
+        {% for case_type in result.case_types %}
+          <tr>
+            <td>
+              <a href="javascript:;"
+                 onclick='context_menu(this, {{ [{"contains": ["phishlabs case type"], "value": case_type.name}]|tojson }}, 0, {{ container }}, null, false);'>
+                {{ case_type.name }}&nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+              </a>
+            </td>
+          </tr>
+        {% endfor %}
+      </table>
+    {% else %}
+      <p>No Case Types in results</p>
+    {% endif %}
+  {% endfor %}
+</div>
